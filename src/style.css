@@ -63,7 +63,7 @@ header{height:78px}.brand{font-size:29px}.panel{padding:18px 24px;border-color:#
 .option-detail p{font-size:16px;line-height:1.7;margin:8px 0}.option-detail b{font-size:16px}.detail-reason{border-top:1px solid #bac8d0;padding-top:8px}
 .explain-footer{height:82px;flex:none}.explain-footer .cat{height:126px;width:84px;left:0;bottom:0}
 .cat-caption{left:100px;width:210px;font-size:14px}.explain-footer .next{font-size:24px;min-width:320px}
-.answer-glow{animation:answer-glow .75s ease-out 1}.cat.success{animation:insight .65s ease-out 1}
+.cat.success{animation:insight .65s ease-out 1}
 @keyframes answer-glow{0%{box-shadow:0 0 0 2px #ffe39c,0 0 30px #f4ce7b99}100%{box-shadow:0 0 0 3px #e4edf118,0 18px 45px #07142150}}
 
 /* An entire new workshop palette for Stage 2 and its review screens. */
@@ -119,3 +119,23 @@ body.stage-two{background:#dceef7;color:#15354c}
 .stage-intro p:not(.stage-lead):not(.eyebrow){line-height:1.75}.stage-principles{margin:18px 0}.stage-intro .ai-note{padding-top:12px}.stage-intro button{margin-top:6px}
 .transitioning .stage-intro>section{animation:stage-arrival .4s ease-out 1}@keyframes stage-arrival{from{opacity:.6;transform:translateY(8px)}to{opacity:1;transform:none}}
 button.gold{transition:transform .15s}
+
+/* Timer: a moving light around the panel, with no overlay on the question. */
+@property --timer-angle { syntax:'<angle>'; initial-value:0deg; inherits:false; }
+.question-panel{position:relative;isolation:isolate}
+.question-panel[data-time-phase="blue"]{--timer-color:#47b9ff;--timer-speed:4s}
+.question-panel[data-time-phase="yellow"]{--timer-color:#f3c94d;--timer-speed:2.4s}
+.question-panel[data-time-phase="red"]{--timer-color:#f47762;--timer-speed:.75s}
+.timer-illumination{position:absolute;inset:-3px;border-radius:27px;padding:3px;pointer-events:none;z-index:2;background:conic-gradient(from var(--timer-angle),transparent 0deg 180deg,var(--timer-color) 255deg 300deg,transparent 350deg);mask:linear-gradient(#fff 0 0) content-box exclude,linear-gradient(#fff 0 0);animation:timer-orbit var(--timer-speed) linear infinite;filter:drop-shadow(0 0 5px var(--timer-color))}
+@keyframes timer-orbit{to{--timer-angle:360deg}}
+.question-panel[data-time-phase] .clock{color:var(--timer-color)}
+.stage-two .question-panel[data-time-phase="blue"] .clock{color:#226d9f}
+.stage-two .question-panel[data-time-phase="yellow"] .clock{color:#866308}
+.stage-two .question-panel[data-time-phase="red"] .clock{color:#a64232}
+/* Feedback persists while reading or reviewing. Only the border pulses. */
+.explanation-panel.feedback-optimal{--feedback-color:#69ca8a}
+.explanation-panel.feedback-possible{--feedback-color:#61b9f2}
+.explanation-panel.feedback-optimal,.explanation-panel.feedback-possible{border-color:var(--feedback-color);animation:feedback-border 2.4s ease-in-out infinite}
+@keyframes feedback-border{0%,100%{box-shadow:0 0 0 1px var(--feedback-color),0 0 5px var(--feedback-color)}50%{box-shadow:0 0 0 3px var(--feedback-color),0 0 21px var(--feedback-color)}}
+.reduce-effects .timer-illumination{background:var(--timer-color);filter:none}
+@media(prefers-reduced-motion:reduce){.timer-illumination{background:var(--timer-color);filter:none}}

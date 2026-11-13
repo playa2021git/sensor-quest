@@ -56,6 +56,9 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
     await page.keyboard.press(key); await page.keyboard.press(key);
     const evaluation = questions[i].choices.find(c => c.id === id).evaluation;
     await page.locator(`.selection.${evaluation}`).waitFor();
+    const feedback = await page.locator('.explanation-panel').getAttribute('class');
+    assert.equal(feedback.includes('feedback-optimal'), evaluation === 'optimal');
+    assert.equal(feedback.includes('feedback-possible'), evaluation === 'possible');
     if (evaluation === 'possible') assert.match(await page.locator('.possible-note').innerText(), /その方法でも実現できます/);
     await layout(page, `explanation ${i+1}`);
     if ([0,1,5,8].includes(i)) await page.screenshot({ path:`work/v2-explanation-${i+1}.png` });
@@ -111,12 +114,22 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
   // A controllable monotonic clock verifies deadline and untimed behavior.
   const clockContext = await browser.newContext({ viewport:{ width:1366, height:768 }, reducedMotion:'reduce' });
   const timed = await clockContext.newPage(); checkPage(timed); await timed.clock.install(); await timed.goto(base); await timed.locator('[data-action="start"]').click();
-  await timed.clock.fastForward(30000); assert.equal(await timed.locator('#seconds').innerText(), '30');
-  await timed.clock.fastForward(31000); await timed.locator('.selection.timeout').waitFor(); assert.match(await timed.locator('.selection-label').innerText(), /\+0点/);
+  assert.equal(await timed.locator('#seconds').innerText(), '30');
+  assert.equal(await timed.locator('.question-panel').getAttribute('data-time-phase'), 'blue');
+  await timed.clock.fastForward(14000); assert.equal(await timed.locator('#seconds').innerText(), '16');
+  assert.equal(await timed.locator('.question-panel').getAttribute('data-time-phase'), 'blue');
+  await timed.clock.fastForward(1000); assert.equal(await timed.locator('#seconds').innerText(), '15');
+  assert.equal(await timed.locator('.question-panel').getAttribute('data-time-phase'), 'yellow');
+  await timed.clock.fastForward(9000); assert.equal(await timed.locator('#seconds').innerText(), '6');
+  assert.equal(await timed.locator('.question-panel').getAttribute('data-time-phase'), 'yellow');
+  await timed.clock.fastForward(1000); assert.equal(await timed.locator('#seconds').innerText(), '5');
+  assert.equal(await timed.locator('.question-panel').getAttribute('data-time-phase'), 'red');
+  await timed.clock.fastForward(6000); await timed.locator('.selection.timeout').waitFor(); assert.equal(await timed.locator('.feedback-optimal,.feedback-possible').count(), 0); assert.match(await timed.locator('.selection-label').innerText(), /\+0点/);
   await timed.locator('[data-action="next"]').click(); await timed.locator('[data-action="settings"]').click(); await timed.locator('#timed').uncheck(); await timed.locator('#close-modal').click();
   await timed.keyboard.press('A'); await timed.locator('[data-action="next"]').click(); await timed.clock.fastForward(70000); assert.equal(await timed.locator('#seconds').innerText(), '∞');
+  assert.equal(await timed.locator('.timer-illumination').count(), 0);
   assert.equal(await timed.evaluate(() => document.getAnimations().length), 0);
-  checks.push('60-second monotonic timer, timeout 0, untimed next question, reduced-motion');
+  checks.push('30-second timer and 15/5-second color boundaries, timeout 0, untimed next question, reduced-motion');
   await clockContext.close();
   const missing = await browser.newPage({ viewport:{ width:1366, height:768 } }); checkPage(missing);
   await missing.route('**/assets/*.png', route => route.abort()); await missing.goto(base); await missing.locator('[data-action="start"]').click(); await missing.locator('.image-frame.missing').waitFor();
