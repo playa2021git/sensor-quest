@@ -1,0 +1,14 @@
+{
+  "name": "sensor-quest",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "start": "python3 -m http.server 4173 --bind 0.0.0.0",
+    "test:browser": "node tests/browser-check.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}
