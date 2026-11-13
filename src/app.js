@@ -5,6 +5,7 @@ import { sceneSheets, catSheet, catPoses, sceneReplacements, catReplacements } f
 
 const app = document.querySelector('#app');
 const modal = document.querySelector('#modal');
+const QUESTION_SECONDS = 30;
 const letters = ['A', 'B', 'C', 'D', 'E'];
 const labels = { optimal: '最適', possible: '実現可能', unsuitable: '不適切', timeout: '時間切れ' };
 let settings = { timed: true, effects: true, volume: 0 };
@@ -48,14 +49,17 @@ function stageTransition() {
 function question() {
   clearInterval(timer); state = 'question'; order = shuffle(questions[index].choices);
   const q = questions[index]; activeTimed = settings.timed; setTheme(q.stage);
-  shell(`<main class="panel question-panel"><div class="panel-heading"><span class="tag">STAGE ${q.stage} / ${q.stage === 1 ? '身近な技術を、授業のデバイスで' : '再発明・問題解決'}</span><span class="counter">第 ${index + 1} 問 <em>/ 全${questions.length}問</em></span></div><div class="question-grid"><section class="problem"><h1>${q.title}</h1><div class="illustration">${image(q)}<span>MISSION ${String(index + 1).padStart(2, '0')}</span></div><h2>${q.scenario}</h2><div class="conditions"><b>▧ 今回の条件・優先すること</b><p>${q.requirements}</p></div></section><section class="answer-area"><div class="answer-heading"><h2>最適な入力は、どれ？</h2><span class="clock" role="timer" aria-label="回答の残り時間">◷ <b id="seconds">${settings.timed ? '60' : '∞'}</b><small>${settings.timed ? '秒' : '制限なし'}</small></span></div><div class="choices">${order.map((c, i) => `<button class="choice" data-choice="${c.id}"><kbd>${letters[i]}</kbd><span>${c.label}</span><span class="arrow">›</span></button>`).join('')}</div><p class="keyboard">A〜Eキー / Tab＋Enter でも回答できます</p><div class="guide">${cat('think')}<p>何を知るために、何を取得する？<br><strong>条件と優先事項</strong>を手がかりにしよう。</p></div></section></div></main><div class="bottom-bar"><button data-action="quit">⌂ タイトルへ</button><span>入力で情報を取得 → プログラムで判断 → 出力で動作</span><button data-action="book">▤ 図鑑</button></div>`);
-  if (activeTimed) { deadline = performance.now() + 60000; timer = setInterval(tick, 200); }
+  shell(`<main class="panel question-panel" ${activeTimed ? 'data-time-phase="blue"' : ''}>${activeTimed ? '<div class="timer-illumination" aria-hidden="true"></div>' : ''}<div class="panel-heading"><span class="tag">STAGE ${q.stage} / ${q.stage === 1 ? '身近な技術を、授業のデバイスで' : '再発明・問題解決'}</span><span class="counter">第 ${index + 1} 問 <em>/ 全${questions.length}問</em></span></div><div class="question-grid"><section class="problem"><h1>${q.title}</h1><div class="illustration">${image(q)}<span>MISSION ${String(index + 1).padStart(2, '0')}</span></div><h2>${q.scenario}</h2><div class="conditions"><b>▧ 今回の条件・優先すること</b><p>${q.requirements}</p></div></section><section class="answer-area"><div class="answer-heading"><h2>最適な入力は、どれ？</h2><span class="clock" role="timer" aria-label="回答の残り時間">◷ <b id="seconds">${activeTimed ? QUESTION_SECONDS : '∞'}</b><small>${settings.timed ? '秒' : '制限なし'}</small></span></div><div class="choices">${order.map((c, i) => `<button class="choice" data-choice="${c.id}"><kbd>${letters[i]}</kbd><span>${c.label}</span><span class="arrow">›</span></button>`).join('')}</div><p class="keyboard">A〜Eキー / Tab＋Enter でも回答できます</p><div class="guide">${cat('think')}<p>何を知るために、何を取得する？<br><strong>条件と優先事項</strong>を手がかりにしよう。</p></div></section></div></main><div class="bottom-bar"><button data-action="quit">⌂ タイトルへ</button><span>入力で情報を取得 → プログラムで判断 → 出力で動作</span><button data-action="book">▤ 図鑑</button></div>`);
+  if (activeTimed) { deadline = performance.now() + QUESTION_SECONDS * 1000; timer = setInterval(tick, 200); }
 }
 function tick() {
   if (state !== 'question') return;
   const seconds = Math.max(0, Math.ceil((deadline - performance.now()) / 1000));
   const el = document.querySelector('#seconds');
-  if (el) { el.textContent = seconds; el.parentElement.classList.toggle('urgent', seconds <= 10); }
+  if (el) {
+    el.textContent = seconds;
+    document.querySelector('.question-panel').dataset.timePhase = seconds > 15 ? 'blue' : seconds > 5 ? 'yellow' : 'red';
+  }
   if (seconds === 0) answer(null);
 }
 function answer(id) {
@@ -64,7 +68,7 @@ function answer(id) {
   state = 'explanation'; clearInterval(timer);
   answers.push(evaluate(questions[index], id));
   playAnswerSound(answers.at(-1).score);
-  explanation(answers.at(-1), true);
+  explanation(answers.at(-1));
 }
 function playAnswerSound(score) {
   if (!settings.volume) return;
@@ -75,12 +79,12 @@ function playAnswerSound(score) {
     oscillator.stop(ac.currentTime + .2); oscillator.onended = () => ac.close();
   } catch { /* Audio is optional. */ }
 }
-function explanation(a, fresh = false) {
+function explanation(a) {
   state = 'explanation';
   const q = questions.find(q => q.id === a.questionId), chosen = q.choices.find(c => c.id === a.choiceId);
   const best = q.choices.find(c => c.evaluation === 'optimal'), good = a.evaluation === 'optimal';
   setTheme(q.stage);
-  shell(`<main class="panel explanation-panel ${fresh && good && effectsEnabled() ? 'answer-glow' : ''}"><div class="panel-heading"><span class="tag">${review ? '振り返り' : '解説'} / ${q.title}</span><span class="counter">第 ${questions.indexOf(q) + 1} 問 / 全${questions.length}問</span></div><div class="explain-top"><div class="illustration">${image(q)}</div><section class="selection ${a.evaluation}"><div class="selection-label">あなたの選択 <strong>${labels[a.evaluation]}</strong><span>+${a.score}点</span></div><h1>${chosen?.label ?? '回答時間が終了しました'}</h1><p class="selected-info"><b>取得：</b>${chosen?.information ?? '今回は未回答です。最適な方法と他の選択肢を確認しよう。'}</p>${a.evaluation === 'possible' ? '<p class="possible-note">その方法でも実現できます。ただし、今回は最適とは言えません。</p>' : ''}<p class="selected-reason">${chosen?.explanation ?? q.explanation}</p></section></div><div class="explain-bottom"><section class="best"><span class="ribbon">♛ 今回の最適な入力</span><h2>${best.label}</h2><p>${best.explanation}</p><div class="learning">✓ ${q.learningPoint}</div><div class="output-note">出力の例：${q.outputs.map(id => devices.find(d => d.id === id).name).join('・')}<small>入力を取得する装置とは別の役割です。</small></div></section><section class="others"><h2>5つの方法を比較する <small>選んで詳しく確認</small></h2><div class="option-tabs" role="tablist" aria-label="全選択肢の比較">${q.choices.map((c, i) => `<button role="tab" id="option-${i}" aria-controls="option-detail" aria-selected="${c === (chosen || best)}" tabindex="${c === (chosen || best) ? 0 : -1}" data-option="${c.id}">${i + 1}<span>${c.label}</span></button>`).join('')}</div><div id="option-detail" class="option-detail" role="tabpanel" tabindex="0"></div></section></div></main><div class="explain-footer">${cat(good ? 'success' : 'explain')}<span class="cat-caption">${good ? '条件に合う入力を発見！' : '比べて考えることが、発明の力になる。'}</span><button class="gold next" data-action="${review ? 'review-next' : 'next'}">${review ? (reviewIndex === answers.length - 1 ? '結果に戻る' : '次の解説へ') : index === questions.length - 1 ? 'クエスト結果へ' : index === 4 ? '次のステージへ' : '次の問題へ'}　›</button>${review ? '<button data-action="result">結果に戻る</button>' : ''}</div>`, 'explaining', questions.indexOf(q));
+  shell(`<main class="panel explanation-panel ${good ? 'feedback-optimal' : a.evaluation === 'possible' ? 'feedback-possible' : ''}"><div class="panel-heading"><span class="tag">${review ? '振り返り' : '解説'} / ${q.title}</span><span class="counter">第 ${questions.indexOf(q) + 1} 問 / 全${questions.length}問</span></div><div class="explain-top"><div class="illustration">${image(q)}</div><section class="selection ${a.evaluation}"><div class="selection-label">あなたの選択 <strong>${labels[a.evaluation]}</strong><span>+${a.score}点</span></div><h1>${chosen?.label ?? '回答時間が終了しました'}</h1><p class="selected-info"><b>取得：</b>${chosen?.information ?? '今回は未回答です。最適な方法と他の選択肢を確認しよう。'}</p>${a.evaluation === 'possible' ? '<p class="possible-note">その方法でも実現できます。ただし、今回は最適とは言えません。</p>' : ''}<p class="selected-reason">${chosen?.explanation ?? q.explanation}</p></section></div><div class="explain-bottom"><section class="best"><span class="ribbon">♛ 今回の最適な入力</span><h2>${best.label}</h2><p>${best.explanation}</p><div class="learning">✓ ${q.learningPoint}</div><div class="output-note">出力の例：${q.outputs.map(id => devices.find(d => d.id === id).name).join('・')}<small>入力を取得する装置とは別の役割です。</small></div></section><section class="others"><h2>5つの方法を比較する <small>選んで詳しく確認</small></h2><div class="option-tabs" role="tablist" aria-label="全選択肢の比較">${q.choices.map((c, i) => `<button role="tab" id="option-${i}" aria-controls="option-detail" aria-selected="${c === (chosen || best)}" tabindex="${c === (chosen || best) ? 0 : -1}" data-option="${c.id}">${i + 1}<span>${c.label}</span></button>`).join('')}</div><div id="option-detail" class="option-detail" role="tabpanel" tabindex="0"></div></section></div></main><div class="explain-footer">${cat(good ? 'success' : 'explain')}<span class="cat-caption">${good ? '条件に合う入力を発見！' : '比べて考えることが、発明の力になる。'}</span><button class="gold next" data-action="${review ? 'review-next' : 'next'}">${review ? (reviewIndex === answers.length - 1 ? '結果に戻る' : '次の解説へ') : index === questions.length - 1 ? 'クエスト結果へ' : index === 4 ? '次のステージへ' : '次の問題へ'}　›</button>${review ? '<button data-action="result">結果に戻る</button>' : ''}</div>`, 'explaining', questions.indexOf(q));
   optionDetail(q, chosen?.id || best.id);
 }
 function optionDetail(q, id) {
@@ -115,14 +119,14 @@ function reviewList(missed) {
 }
 function showModal(html) { document.querySelector('#modal-content').innerHTML = html; modal.showModal(); }
 function help() {
-  showModal(`<p class="eyebrow">HOW TO PLAY</p><h2>条件を読み、最適な入力を選ぼう。</h2><ol class="help-list"><li>「今回の条件・優先すること」を確認。</li><li>5つから選ぶ。クリック、A〜Eキー、Tab＋Enterが使えます。</li><li>解説の比較タブで5つすべての長所・限界を確認。</li></ol><div class="help-scores"><b>最適：2点</b><b>実現可能：1点</b><b>不適切・時間切れ：0点</b></div><p>全10問・20点満点。1問60秒。速さによる加点はなく、設定で時間制限をなくせます。第6問の前にステージが切り替わります。</p><p>ボタンも入力装置。AIはカメラやマイク等の情報をモデルで分類する仕組みです。micro:bit単体ではTeachable Machineを実行できず、Chromebook等との連携が必要です。</p>`);
+  showModal(`<p class="eyebrow">HOW TO PLAY</p><h2>条件を読み、最適な入力を選ぼう。</h2><ol class="help-list"><li>「今回の条件・優先すること」を確認。</li><li>5つから選ぶ。クリック、A〜Eキー、Tab＋Enterが使えます。</li><li>解説の比較タブで5つすべての長所・限界を確認。</li></ol><div class="help-scores"><b>最適：2点</b><b>実現可能：1点</b><b>不適切・時間切れ：0点</b></div><p>全10問・20点満点。1問30秒。速さによる加点はなく、設定で時間制限をなくせます。第6問の前にステージが切り替わります。</p><p>ボタンも入力装置。AIはカメラやマイク等の情報をモデルで分類する仕組みです。micro:bit単体ではTeachable Machineを実行できず、Chromebook等との連携が必要です。</p>`);
 }
 function book() {
   const groups = [['input', '入力装置・センサ / 11種類'], ['ai', 'AI入力 / 3種類'], ['output', '出力装置 / 5種類']];
   showModal(`<p class="eyebrow">DEVICE FIELD GUIDE</p><h2>入出力デバイス図鑑</h2><p>ボタンとタッチロゴも入力装置。AIは取得した情報を学習済みモデルで分類します。<br>Teachable MachineはChromebook等で実行し、結果をmicro:bitと連携します。</p>${groups.map(([type, title]) => `<h3 class="device-group">${title}</h3><div class="book-grid">${devices.filter(d => d.category === type).map(d => `<article data-device="${d.id}"><h3>${d.name}</h3><p><b>${type === 'output' ? '出力する働き' : '取得する情報'}：</b>${d.information}</p><p><b>分からない：</b>${d.unknown}</p><p><b>使用例：</b>${d.example}</p><p><b>限界・注意：</b>${d.limitation}</p></article>`).join('')}</div>`).join('')}`);
 }
 function settingsModal() {
-  showModal(`<p class="eyebrow">WORKSHOP SETTINGS</p><h2>音量・演出設定</h2><label class="setting"><span>1問60秒の時間制限<small>変更は次の問題から適用</small></span><input id="timed" type="checkbox" ${settings.timed ? 'checked' : ''}></label><label class="setting"><span>アニメーション・演出<small>正解の光、猫、結果の光・紙吹雪・得点カウント</small></span><input id="effects" type="checkbox" ${settings.effects ? 'checked' : ''}></label><label class="setting"><span>回答音の音量<small>初期設定はミュート</small></span><input id="volume" type="range" min="0" max="100" value="${settings.volume}"></label><p>設定はこのブラウザに保存します。OSの「動きを減らす」設定も優先します。問題の時計はダイアログ表示中も進みます。</p>`);
+  showModal(`<p class="eyebrow">WORKSHOP SETTINGS</p><h2>音量・演出設定</h2><label class="setting"><span>1問30秒の時間制限<small>変更は次の問題から適用</small></span><input id="timed" type="checkbox" ${settings.timed ? 'checked' : ''}></label><label class="setting"><span>アニメーション・演出<small>時間のイルミネーション、解説の枠、猫、結果の演出</small></span><input id="effects" type="checkbox" ${settings.effects ? 'checked' : ''}></label><label class="setting"><span>回答音の音量<small>初期設定はミュート</small></span><input id="volume" type="range" min="0" max="100" value="${settings.volume}"></label><p>設定はこのブラウザに保存します。OSの「動きを減らす」設定も優先します。問題の時計はダイアログ表示中も進みます。</p>`);
 }
 function currentExplanationQuestion() { return questions[review ? reviewIndex : index]; }
 document.querySelector('#close-modal').onclick = () => modal.close();
