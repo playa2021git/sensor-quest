@@ -8,7 +8,7 @@ export function summarize(answers) {
   const counts = { optimal: 0, possible: 0, unsuitable: 0, timeout: 0 };
   answers.forEach(a => counts[a.evaluation]++);
   const score = answers.reduce((sum, a) => sum + a.score, 0);
-  return { ...counts, score, rank: score >= 18 ? 'S' : score >= 14 ? 'A' : score >= 10 ? 'B' : 'C' };
+  return { ...counts, score, rank: score >= 18 ? 'S' : score >= 15 ? 'A' : score >= 11 ? 'B' : score >= 7 ? 'C' : 'D' };
 }
 export function shuffle(items, random = Math.random) {
   const result = [...items];
