@@ -37,6 +37,9 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
 (async () => {
   for (let retry = 0; retry < 30; retry++) { try { if ((await fetch(base)).ok) break; } catch {} await new Promise(r => setTimeout(r, 100)); }
   const { questions } = await import('../src/questions.js');
+  const { evaluate, summarize } = await import('../src/engine.js');
+  const mixedIds = questions.map((q,i) => i % 3 === 0 ? 'best' : i % 3 === 1 ? 'c0' : 'c2');
+  const mixedSummary = summarize(questions.map((q,i) => evaluate(q,mixedIds[i])));
   browser = await chromium.launch({ headless:true, executablePath:process.env.CHROMIUM_PATH || '/usr/bin/chromium', args:['--no-sandbox'] });
   const context = await browser.newContext({ viewport:{ width:1366, height:768 } });
   const page = await context.newPage(); checkPage(page); await page.goto(base);
@@ -47,11 +50,14 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
   checks.push('19-device encyclopedia, help, fullscreen');
   await page.locator('[data-action="start"]').click();
   for (let i = 0; i < 10; i++) {
-    assert.equal(await page.locator('.choice').count(), 5);
+    assert.equal(await page.locator('.choice').count(), 4);
     assert.equal(await page.locator('body').evaluate(el => el.classList.contains('stage-two')), i >= 5);
     await layout(page, `question ${i+1}`);
     if ([0,5,8].includes(i)) await page.screenshot({ path:`work/v2-question-${i+1}.png` });
-    const id = i % 3 === 0 ? 'best' : i % 3 === 1 ? 'c0' : 'c3';
+    const id = mixedIds[i];
+    // Removed E shortcut must not answer or throw.
+    await page.keyboard.press('E');
+    assert.equal(await page.locator('.choice').count(), 4);
     const key = await page.locator(`[data-choice="${id}"] kbd`).innerText();
     await page.keyboard.press(key); await page.keyboard.press(key);
     const evaluation = questions[i].choices.find(c => c.id === id).evaluation;
@@ -65,15 +71,15 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
     await next(page, i);
   }
   await page.getByText('クエスト結果', { exact:true }).waitFor();
-  await page.waitForFunction(() => document.querySelector('#score-value').textContent === '11');
-  assert.match(await page.locator('.rank').innerText(), /B/); await layout(page, 'mixed result');
+  await page.waitForFunction(score => document.querySelector('#score-value').textContent === String(score), mixedSummary.score);
+  assert.ok((await page.locator('.rank').innerText()).includes(mixedSummary.rank)); await layout(page, 'mixed result');
   await page.screenshot({ path:'work/v2-result.png' });
-  await page.locator('[data-action="review-missed"]').click(); assert.equal(await page.locator('[data-review]').count(), 6); await page.locator('#close-modal').click();
+  await page.locator('[data-action="review-missed"]').click(); assert.equal(await page.locator('[data-review]').count(), 10 - mixedSummary.optimal); await page.locator('#close-modal').click();
   await page.locator('[data-action="review-all"]').click(); assert.equal(await page.locator('[data-review]').count(), 10);
   await page.locator('[data-review="0"]').click();
   for (let i = 0; i < 10; i++) {
     assert.equal(await page.locator('body').evaluate(el => el.classList.contains('stage-two')), i >= 5);
-    assert.equal(await page.locator('[role="tab"]').count(), 5);
+    assert.equal(await page.locator('[role="tab"]').count(), 4);
     for (const choice of questions[i].choices) {
       await page.locator(`[data-option="${choice.id}"]`).click();
       assert.ok((await page.locator('.option-detail').innerText()).includes(choice.information));
@@ -84,10 +90,10 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
     assert.equal(await page.locator('[role="tab"]').first().getAttribute('aria-selected'), 'true');
     await page.locator('[data-action="review-next"]').click();
   }
-  checks.push('10 questions via keys, double-answer guard, mixed 11/20 B, review all 50 choice explanations, theme during review');
+  checks.push('10 questions via keys, double-answer guard, mixed score and rank, review all 40 choice explanations, theme during review');
   // Perfect score and celebration, then disabling every animation.
   await page.locator('[data-action="start"]').click();
-  for (let i = 0; i < 10; i++) { await page.locator('[data-choice="best"]').click(); await layout(page, `optimal explanation ${i+1}`); await next(page, i); }
+  for (let i = 0; i < 10; i++) { await page.locator(i === 0 ? '[data-choice="c0"]' : '[data-choice="best"]').click(); if (i === 0) { assert.match(await page.locator('.best h2').innerText(), /タッチロゴ/); assert.match(await page.locator('.best h2').innerText(), /ボタン/); } await layout(page, `optimal explanation ${i+1}`); await next(page, i); }
   await page.waitForFunction(() => document.querySelector('#score-value').textContent === '20');
   assert.equal(await page.locator('.confetti i').count(), 22); assert.equal(await page.locator('.perfect').count(), 1);
   await page.screenshot({ path:'work/v2-perfect.png' });
@@ -99,17 +105,17 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
   // A full alternative-method run checks every question's longer possible explanation.
   await page.locator('[data-action="start"]').click();
   for (let i = 0; i < 10; i++) {
-    const choice = questions[i].choices.find(c => c.evaluation === 'possible');
+    const choice = questions[i].choices.find(c => c.evaluation === 'possible') || questions[i].choices.find(c => c.id !== 'best' && c.evaluation === 'optimal') || questions[i].choices.find(c => c.evaluation === 'unsuitable');
     await page.locator(`[data-choice="${choice.id}"]`).click();
-    await page.locator('.selection.possible').waitFor();
+    await page.locator(`.selection.${choice.evaluation}`).waitFor();
     await layout(page, `possible explanation ${i+1}`);
     await next(page, i);
   }
-  assert.equal(await page.locator('#score-value').innerText(), '10');
-  assert.match(await page.locator('.rank').innerText(), /C/);
-  assert.match(await page.locator('.result-message').innerText(), /実現可能な方法も10問/);
+  await page.waitForFunction(() => document.querySelector('#score-value').textContent === '4');
+  assert.match(await page.locator('.rank').innerText(), /D/);
+  assert.match(await page.locator('.result-message').innerText(), /実現可能な方法も4問/);
   assert.equal(await page.locator('.confetti').count(), 0);
-  checks.push('all 10 possible answers: 10/20 C, longer explanations, positive learning message');
+  checks.push('alternative methods including questions without possible answers: 4/20 D, all longer explanations');
   await context.close();
   // A controllable monotonic clock verifies deadline and untimed behavior.
   const clockContext = await browser.newContext({ viewport:{ width:1366, height:768 }, reducedMotion:'reduce' });

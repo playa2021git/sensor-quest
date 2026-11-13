@@ -2,7 +2,9 @@
 // falls back to the sheet; if the sheet is missing, the HTML caption remains.
 export const sceneSheets = {
   stage1: 'assets/stage1-scenes.png',
-  stage2: 'assets/stage2-scenes.png'
+  stage2: 'assets/stage2-scenes.png',
+  v3stage1: 'assets/scenes-v3-stage1.png',
+  v3stage2: 'assets/scenes-v3-stage2.png'
 };
 export const catSheet = 'assets/cat-poses.png';
 export const catPoses = {
