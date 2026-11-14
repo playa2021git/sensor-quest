@@ -126,7 +126,7 @@ button.gold{transition:transform .15s}
 .question-panel[data-time-phase="blue"]{--timer-color:#47b9ff;--timer-speed:4s}
 .question-panel[data-time-phase="yellow"]{--timer-color:#f3c94d;--timer-speed:2.4s}
 .question-panel[data-time-phase="red"]{--timer-color:#f47762;--timer-speed:.75s}
-.timer-illumination{position:absolute;inset:-3px;border-radius:27px;padding:3px;pointer-events:none;z-index:2;background:conic-gradient(from var(--timer-angle),transparent 0deg 180deg,var(--timer-color) 255deg 300deg,transparent 350deg);mask:linear-gradient(#fff 0 0) content-box exclude,linear-gradient(#fff 0 0);animation:timer-orbit var(--timer-speed) linear infinite;filter:drop-shadow(0 0 5px var(--timer-color))}
+.timer-illumination{position:absolute;inset:-6px;border-radius:30px;padding:9px;pointer-events:none;z-index:2;background:conic-gradient(from var(--timer-angle),transparent 0deg 180deg,var(--timer-color) 255deg 300deg,transparent 350deg);mask:linear-gradient(#fff 0 0) content-box exclude,linear-gradient(#fff 0 0);animation:timer-orbit var(--timer-speed) linear infinite;filter:drop-shadow(0 0 5px var(--timer-color))}
 @keyframes timer-orbit{to{--timer-angle:360deg}}
 .question-panel[data-time-phase] .clock{color:var(--timer-color)}
 .stage-two .question-panel[data-time-phase="blue"] .clock{color:#226d9f}
@@ -139,3 +139,15 @@ button.gold{transition:transform .15s}
 @keyframes feedback-border{0%,100%{box-shadow:0 0 0 1px var(--feedback-color),0 0 5px var(--feedback-color)}50%{box-shadow:0 0 0 3px var(--feedback-color),0 0 21px var(--feedback-color)}}
 .reduce-effects .timer-illumination{background:var(--timer-color);filter:none}
 @media(prefers-reduced-motion:reduce){.timer-illumination{background:var(--timer-color);filter:none}}
+
+/* Emphasize the mission independently of the countdown color. */
+.problem .illustration{height:216px;min-height:216px;max-height:216px}
+.problem .mission-statement{position:relative;isolation:isolate;flex:none;color:#ffe18a;background:#332d20;font-size:26px;font-weight:800;line-height:1.45;margin:12px 0;padding:13px 16px;border-radius:15px;text-shadow:0 1px 3px #0008}
+.mission-statement>span{position:relative;z-index:1}
+.mission-lights{position:absolute;inset:0;overflow:visible;pointer-events:none;color:#ffd36b;filter:drop-shadow(0 0 4px #ffc84c)}
+.mission-lights rect{fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-dasharray:2 12;animation:mission-march 12s linear infinite}
+@keyframes mission-march{to{stroke-dashoffset:-140}}
+.stage-two .mission-statement{color:#854000;background:#fff6d7;text-shadow:none}
+.stage-two .mission-lights{color:#b56600;filter:drop-shadow(0 0 3px #e9aa32)}
+.reduce-effects .mission-lights{filter:none}
+@media(prefers-reduced-motion:reduce){.mission-lights{filter:none}}
