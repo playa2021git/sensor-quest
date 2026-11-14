@@ -15,7 +15,7 @@
 | 9 勉強中のスマホ注意係 | assets/scenes-v3-stage2.png | 3 |
 | 10 置き配の持ち去りお知らせ | assets/scenes-v3-stage2.png | 4 |
 
-第2問だけは従来のstage1-scenes.pngの上段右をそのまま使用します。旧stage2-scenes.pngは問題では参照しません。案内猫はcat-poses.pngを継続利用します。
+第2問だけは従来のstage1-scenes.pngの上段右をそのまま使用します。旧stage2-scenes.pngは問題では参照しません。案内猫は透過背景のcat-manga.png（3列×2行）を使用します。丸い目、ピンクの頬、黄色いヘルメット、青緑の服の漫画調キャラクターです。
 
 ## 差し替え
 

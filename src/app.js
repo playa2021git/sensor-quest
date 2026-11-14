@@ -23,7 +23,7 @@ const escape = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', 
 function cat(pose = 'normal') {
   const config = catPoses[pose] || catPoses.normal;
   const replacement = catReplacements[pose];
-  return `<span class="cat ${pose}" role="img" aria-label="黄色い瞳と安全ヘルメットの灰白の案内猫"><img class="${replacement ? 'cat-individual' : 'cat-sheet'}" src="${replacement || catSheet}" data-fallback="cat" data-tile="${config.tile}" style="--column:${config.tile % 3};--row:${Math.floor(config.tile / 3)}" alt=""></span>`;
+  return `<span class="cat ${pose}" role="img" aria-label="丸い目と黄色いヘルメット、青緑の服の漫画調の案内猫"><img class="${replacement ? 'cat-individual' : 'cat-sheet'}" src="${replacement || catSheet}" data-fallback="cat" data-tile="${config.tile}" style="--column:${config.tile % 3};--row:${Math.floor(config.tile / 3)}" alt=""></span>`;
 }
 function image(q) {
   const replacement = sceneReplacements[q.id];

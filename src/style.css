@@ -158,3 +158,21 @@ button.gold{transition:transform .15s}
 .choice:nth-child(3){--key-color:#abd7ff;--key-border:#4b91cd}
 .choice:nth-child(4){--key-color:#dfbaff;--key-border:#a26bcd}
 .choice kbd,.stage-two .choice kbd{background:var(--key-color);border:2px solid var(--key-border);color:#172a3b;box-shadow:0 0 0 2px #ffffff12}
+
+/* Stronger contrast against the white second-stage cards. */
+.stage-two .mission-statement{color:#153e58;background:#edf8ff}
+.stage-two .mission-lights{color:#087f68;filter:drop-shadow(0 0 2px #087f6855)}
+.stage-two .choice:nth-child(1){--key-color:#16733e;--key-border:#0f5c30}
+.stage-two .choice:nth-child(2){--key-color:#b52d47;--key-border:#962039}
+.stage-two .choice:nth-child(3){--key-color:#2164ac;--key-border:#174f8b}
+.stage-two .choice:nth-child(4){--key-color:#7a3fa5;--key-border:#622d89}
+.stage-two .choice kbd{color:#fff;box-shadow:none}
+/* Give the manga guide a readable face without covering the answer buttons. */
+.guide{height:118px;gap:18px}
+.guide .cat{width:88px;height:132px}
+.explain-footer .cat{width:104px;height:156px}
+.result-cat{width:108px;height:162px}
+.result-cat .cat{width:108px;height:162px}
+.result-message{padding-left:116px}
+body.stage-two.reduce-effects .mission-lights{filter:none}
+@media(prefers-reduced-motion:reduce){.stage-two .mission-lights{filter:none}}
