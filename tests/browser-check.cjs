@@ -93,7 +93,7 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
   checks.push('10 questions via keys, double-answer guard, mixed score and rank, review all 40 choice explanations, theme during review');
   // Perfect score and celebration, then disabling every animation.
   await page.locator('[data-action="start"]').click();
-  for (let i = 0; i < 10; i++) { await page.locator(i === 0 ? '[data-choice="c0"]' : '[data-choice="best"]').click(); if (i === 0) { assert.match(await page.locator('.best h2').innerText(), /タッチロゴ/); assert.match(await page.locator('.best h2').innerText(), /ボタン/); } await layout(page, `optimal explanation ${i+1}`); await next(page, i); }
+  for (let i = 0; i < 10; i++) { await page.locator('[data-choice="best"]').click(); await layout(page, `optimal explanation ${i+1}`); await next(page, i); }
   await page.waitForFunction(() => document.querySelector('#score-value').textContent === '20');
   assert.equal(await page.locator('.confetti i').count(), 22); assert.equal(await page.locator('.perfect').count(), 1);
   await page.screenshot({ path:'work/v2-perfect.png' });
@@ -108,6 +108,7 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
     const choice = questions[i].choices.find(c => c.evaluation === 'possible') || questions[i].choices.find(c => c.id !== 'best' && c.evaluation === 'optimal') || questions[i].choices.find(c => c.evaluation === 'unsuitable');
     await page.locator(`[data-choice="${choice.id}"]`).click();
     await page.locator(`.selection.${choice.evaluation}`).waitFor();
+    if (i === 0) { assert.equal(choice.id, 'c0'); assert.match(await page.locator('.selection-label').innerText(), /\+1点/); assert.match(await page.locator('.selected-reason').innerText(), /水/); }
     await layout(page, `possible explanation ${i+1}`);
     await next(page, i);
   }

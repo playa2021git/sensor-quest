@@ -14,8 +14,8 @@ test('10 questions, four complete choices, declared optimal counts, sources and 
     for (const key of ['id','stage','title','scenario','requirements','image','choices','explanation','limitations','learningPoint','sourceNotes','misconception','imageAlt']) assert.ok(q[key], `${q.id}: ${key}`);
     assert.equal(q.stage, i < 5 ? 1 : 2); assert.equal(q.choices.length, 4);
     assert.equal(new Set(q.choices.map(c => c.id)).size, 4);
-    assert.equal(q.choices.filter(c => c.evaluation === 'optimal').length, i === 0 ? 2 : 1);
-    assert.equal(q.choices.filter(c => c.evaluation === 'possible').length, [1,0,1,0,0,0,0,1,2,0][i]);
+    assert.equal(q.choices.filter(c => c.evaluation === 'optimal').length, 1);
+    assert.equal(q.choices.filter(c => c.evaluation === 'possible').length, [2,0,1,0,0,0,0,1,2,0][i]);
     assert.ok(existsSync(q.image)); assert.ok(q.image.endsWith('.png'));
     for (const c of q.choices) {
       assert.ok(['optimal','possible','unsuitable'].includes(c.evaluation));
@@ -51,8 +51,8 @@ test('shuffle preserves all choices and never mutates the question', () => {
   assert.deepEqual(src.map(c => c.id), before); assert.notDeepEqual(shuffled.map(c => c.id), before); assert.deepEqual(new Set(shuffled), new Set(src));
 });
 
-test('touch input is equally optimal; model answer names both inputs', () => {
-  assert.equal(evaluate(questions[0], 'c0').score, 2);
+test('touch input is possible due to splashes; button stays optimal', () => {
+  assert.equal(evaluate(questions[0], 'c0').score, 1);
   assert.match(questions[0].explanation, /ボタン/);
   assert.match(questions[0].explanation, /タッチ/);
   assert.equal(questions.flatMap(q => q.choices).length, 40);
