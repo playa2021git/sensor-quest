@@ -248,3 +248,52 @@ body.stage-two.reduce-effects .mission-lights{filter:none}
 .basic-answer-label{animation:feedback-arrive .35s ease-out both}
 @keyframes feedback-arrive{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .has-diagram .pir-diagram svg{height:115px}
+
+/* A continuous, slow metallic sheen follows the one-shot judgement. */
+.metal-shine{position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none;z-index:0}
+.metal-shine:before{content:'';position:absolute;inset:-80%;background:linear-gradient(115deg,transparent 28%,#e9b94d30 36%,#fff9df66 40%,#bac9d933 45%,transparent 50%,#dfe5ed55 60%,transparent 70%);background-size:180% 100%;animation:metal-drift 7s ease-in-out infinite alternate}
+.metal-shine i{position:absolute;left:var(--x);top:var(--y);font-style:normal;font-size:14px;color:#bf8d25;text-shadow:0 0 7px #fff8c1;animation:metal-star 3.8s ease-in-out infinite;animation-delay:var(--delay)}
+.metal-shine i:nth-child(3n){color:#7c91a7}.metal-shine i:nth-child(3n + 1){color:#b5a47c}
+@keyframes metal-drift{from{transform:translateX(-12%) rotate(-5deg);background-position:0% 50%}to{transform:translateX(12%) rotate(-5deg);background-position:100% 50%}}
+@keyframes metal-star{0%,100%{opacity:.1;transform:scale(.5) rotate(0deg)}50%{opacity:.85;transform:scale(1.2) rotate(35deg)}}
+.basic-explanation.answer-correct{background:#fff9e9;border-color:#e8c66f;box-shadow:0 0 0 6px #c5b47c,0 0 40px #fff0b76b}
+.answer-correct .answer-status-border{padding:14px;inset:-9px;background:conic-gradient(from var(--timer-angle),#a27c28,#ffed9f,#afbccc,#fffdf2,#b7bcc6,#f4d278,#a27c28);animation:timer-orbit 7s linear infinite}
+.basic-explanation>.basic-heading,.basic-explanation>.basic-answer-label,.basic-explanation>.basic-explain-grid,.basic-explanation>.basic-next{position:relative;z-index:1}
+.explanation-panel.feedback-optimal{position:relative;background:linear-gradient(125deg,#fff6df,#f3f6fa 55%,#fff9ed);border-color:#d9bb72;color:#183e50;isolation:isolate}
+.explanation-panel.feedback-optimal:after,.results:after{content:'';position:absolute;inset:-7px;border-radius:29px;padding:12px;background:conic-gradient(from var(--timer-angle),#a7802d,#ffec9a,#adbaca,#fffdf2,#c6cbd3,#edd293,#a7802d);mask:linear-gradient(#fff 0 0) content-box exclude,linear-gradient(#fff 0 0);pointer-events:none;z-index:3;animation:timer-orbit 7s linear infinite}
+.explanation-panel.feedback-optimal>.panel-heading,.explanation-panel.feedback-optimal>.explain-top,.explanation-panel.feedback-optimal>.explain-bottom{position:relative;z-index:1}
+/* End-of-run stage: gold, silver, platinum, celebratory rays and falling foil. */
+.basic-result,.results{position:relative;isolation:isolate;background:linear-gradient(135deg,#fff3cb,#f9fcff 45%,#f2e5bc 100%);color:#183d50}
+.basic-result{border:6px solid #d9b34e;box-shadow:0 0 0 4px #ecdfb5,0 0 45px #ffe48b77}
+.basic-result>*:not(.metal-shine):not(.finale-effects),.results>.result-ribbon,.results>.result-grid{position:relative;z-index:1}
+.finale-effects{position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none;z-index:0}
+.finale-rays{position:absolute;width:1600px;height:1600px;left:50%;top:0;transform:translate(-50%,-50%);background:repeating-conic-gradient(#e9c4671f 0deg 12deg,transparent 12deg 28deg);animation:finale-turn 40s linear infinite}
+@keyframes finale-turn{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.finale-effects>i{position:absolute;left:var(--x);top:-20px;width:9px;height:17px;background:#d1aa3a;border:1px solid #a28741;animation:finale-foil var(--fall) linear infinite;animation-delay:var(--delay);opacity:.75}
+.finale-effects>i:nth-of-type(3n){background:#c1cbd6;border-color:#8f9ba8}.finale-effects>i:nth-of-type(3n + 1){background:#f9f7e8;border-color:#b4b2a5}
+@keyframes finale-foil{0%{transform:translateY(-30px) rotate(0deg);opacity:0}10%{opacity:.8}90%{opacity:.65}100%{transform:translate(35px,680px) rotate(440deg);opacity:0}}
+.finale-banner{display:inline-block;color:#62430b;background:linear-gradient(115deg,#d7ae48,#fff1b2,#bdc9d7,#fffdf1);padding:10px 40px;border:2px solid #c19b45;border-radius:30px;font-size:22px;letter-spacing:3px;box-shadow:0 5px 15px #9c7a2525}
+.basic-result h1{font-size:40px;color:#65480e;margin:8px 0}
+.basic-finale-hero{display:flex;align-items:center;justify-content:center;gap:30px;margin:8px 0}
+.basic-finale-hero>.cat{width:104px;height:156px}
+.basic-score{margin:0;animation:finale-score .8s cubic-bezier(.2,1.5,.4,1) both}
+.basic-score strong{font-size:100px;line-height:1.15;color:#8d6413;text-shadow:0 2px #fff,0 0 16px #ffe5a2}
+.basic-score span{display:block;font-size:20px}
+@keyframes finale-score{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+.finale-medal{width:135px;height:135px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:50%;border:7px double #b69542;background:radial-gradient(circle,#fffbe6,#f3d074);box-shadow:0 0 0 5px #fff7d8,0 7px 18px #b5943a55;color:#705014;font-size:25px;font-weight:900;transform:rotate(9deg)}
+.finale-medal small{font-size:13px;margin-top:5px}.basic-retry-result .finale-medal{background:radial-gradient(circle,#fff,#cdd7e1);border-color:#8b9eaf;color:#344f66}
+.basic-result>p:not(.basic-topic):not(.basic-save-note){font-size:23px;font-weight:700;margin:8px 0 15px}
+.results .score{color:#7c5916;text-shadow:0 0 20px #e4c25a66}
+.results .rank{background:linear-gradient(120deg,#ffedb0,#f4f8ff);border:3px solid #c8ac61;color:#355168}
+.results .rank strong{color:#8c6413}.results .rank small{background:#776027;color:#fff9df;border-color:#c8b271}
+.results .summary>h2{background:#e4d6aa}.results .track{background:#d4dfe6}.results .insight{background:#fffaf0;border-color:#baa66b}.results .insight h3{background:#eaddb7}
+.results .assessment,.results .review-needed{color:#4b6878}
+.reduce-effects .metal-shine i,.reduce-effects .finale-effects{display:none}
+@media(prefers-reduced-motion:reduce){.metal-shine i,.finale-effects{display:none}}
+.explanation-panel.feedback-optimal{--feedback-color:#dfc779;animation:none;box-shadow:0 0 0 5px #d3bd7d55,0 0 35px #ffedb955}
+.explanation-panel.feedback-optimal .tag{color:#795f20}.explanation-panel.feedback-optimal .counter em{color:#526c80}
+.results>.result-ribbon{position:absolute}
+.stage-two .results{background:linear-gradient(135deg,#fff3cb,#f9fcff 45%,#f2e5bc 100%)}
+.reduce-effects .metal-shine:before,.reduce-effects .results:after,.reduce-effects .explanation-panel:after{animation:none!important}
+@media(prefers-reduced-motion:reduce){.metal-shine:before,.results:after,.explanation-panel:after{animation:none!important}}
+.results>.result-ribbon{z-index:4}

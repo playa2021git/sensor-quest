@@ -68,11 +68,15 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
       const nextBox=await page.locator('.basic-next').boundingBox();assert.ok(nextBox.y+nextBox.height<=768,'next action remains visible');
       if(!correct && i===0) {await page.screenshot({path:'work/basic-warning.png'});assert.equal(await page.locator('.answer-status-border').evaluate(el=>getComputedStyle(el).animationName),'caution-flow');}
       assert.ok((await page.locator('.basic-answer-label').innerText()).includes(`正解：${basicQuestions[i].answer?'○':'×'}`));
+      assert.equal(await page.locator('.basic-explanation .metal-shine').count(),correct?1:0);
+      if (correct) assert.equal(await page.locator('.answer-status-border').evaluate(el=>getComputedStyle(el).paddingTop),'14px');
       if(i===0) {assert.equal(await page.locator('.pir-diagram').count(),1);await page.screenshot({path:'work/basic-pir-explanation.png'});}
       await page.locator('.basic-next').click();
     }
     assert.equal(await page.locator('.basic-score strong').innerText(),String(correctCount));
     assert.equal(await page.locator('.basic-recap details').count(),10);
+    assert.equal(await page.locator('.finale-effects>i').count(),32);
+    assert.equal(await page.locator('.finale-medal').count(),1);
   }
   await basicRun(bp,6);
   assert.equal(await bp.locator('#basic-advanced').count(),0);
@@ -121,6 +125,7 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
       assert.equal(await page.locator('.answer-burst strong').innerText(), evaluation === 'optimal' ? 'MARVELOUS!' : 'GOOD!');
       if (i === 0) { await page.waitForTimeout(180); await page.screenshot({ path:'work/marvelous-burst.png' }); }
       await page.locator('.answer-burst').waitFor({ state:'detached' });
+      assert.equal(await page.locator('.explanation-panel .metal-shine').count(),evaluation==='optimal'?1:0);
     }
     const feedback = await page.locator('.explanation-panel').getAttribute('class');
     assert.equal(feedback.includes('feedback-optimal'), evaluation === 'optimal');
