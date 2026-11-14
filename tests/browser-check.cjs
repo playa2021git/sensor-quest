@@ -41,7 +41,53 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
   const mixedIds = questions.map((q,i) => i % 3 === 0 ? 'best' : i % 3 === 1 ? 'c0' : 'c2');
   const mixedSummary = summarize(questions.map((q,i) => evaluate(q,mixedIds[i])));
   browser = await chromium.launch({ headless:true, executablePath:process.env.CHROMIUM_PATH || '/usr/bin/chromium', args:['--no-sandbox'] });
+  const { basicQuestions } = await import('../src/basics.js');
+  const bc = await browser.newContext({viewport:{width:1366,height:768}});
+  const bp = await bc.newPage(); checkPage(bp); await bp.goto(base);
+  assert.equal(await bp.locator('[data-action="start"]').isDisabled(),true);
+  await bp.screenshot({path:'work/modes-title.png'});
+  async function basicRun(page, correctCount) {
+    await page.locator('[data-action="basic-start"]').click();
+    for(let i=0;i<10;i++) {
+      assert.equal(await page.locator('[data-basic-answer]').count(),2);
+      assert.equal(await page.locator('#seconds').count(),0);
+      await page.waitForFunction(()=>{const img=document.querySelector('.basic-sprite img');return img&&img.complete&&img.naturalWidth>0});
+      const over=await page.evaluate(()=>document.documentElement.scrollHeight>768||document.querySelector('.basic-board').getBoundingClientRect().bottom>768);
+      assert.equal(over,false,`basic ${i+1} overflow`);
+      if(i===0) await page.screenshot({path:'work/basic-question.png'});
+      const value=i<correctCount?basicQuestions[i].answer:!basicQuestions[i].answer;
+      if(i===0) {await page.keyboard.press(value?'ArrowLeft':'ArrowRight');await page.keyboard.press(value?'ArrowLeft':'ArrowRight');}
+      else await page.locator(`[data-basic-answer="${value}"]`).click();
+      await page.locator('.basic-answer-label').waitFor();
+      assert.ok((await page.locator('.basic-answer-label').innerText()).includes(`正解：${basicQuestions[i].answer?'○':'×'}`));
+      if(i===0) {assert.equal(await page.locator('.pir-diagram').count(),1);await page.screenshot({path:'work/basic-pir-explanation.png'});}
+      await page.locator('.basic-next').click();
+    }
+    assert.equal(await page.locator('.basic-score strong').innerText(),String(correctCount));
+    assert.equal(await page.locator('.basic-recap details').count(),10);
+  }
+  await basicRun(bp,6);
+  assert.equal(await bp.locator('#basic-advanced').count(),0);
+  await bp.reload();assert.equal(await bp.locator('[data-action="start"]').isDisabled(),true);
+  await basicRun(bp,7);
+  await bp.screenshot({path:'work/basic-pass.png'});
+  await bp.locator('#basic-advanced').click();assert.equal(await bp.locator('.choice').count(),4);
+  await bp.reload();assert.equal(await bp.locator('[data-action="start"]').isEnabled(),true);
+  await basicRun(bp,0);assert.equal(await bp.locator('#basic-advanced').count(),1);
+  await bp.reload();await bp.locator('[data-action="reset-progress"]').click();await bp.locator('#close-modal').click();assert.equal(await bp.locator('[data-action="start"]').isEnabled(),true);
+  await bp.locator('[data-action="reset-progress"]').click();await bp.locator('[data-action="confirm-reset-progress"]').click();assert.equal(await bp.locator('[data-action="start"]').isDisabled(),true);
+  // Even invoking the advanced action on a tampered button cannot skip the gate.
+  await bp.locator('[data-action="start"]').evaluate(el=>el.disabled=false);await bp.locator('[data-action="start"]').click();assert.equal(await bp.locator('.choice').count(),0);
+  await basicRun(bp,10);
+  const fallback=await bc.newPage();checkPage(fallback);await fallback.route('**/assets/basic-sensors.png',route=>route.abort());await fallback.goto(base);await fallback.locator('[data-action="basic-start"]').click();await fallback.locator('.basic-image-missing').waitFor();await fallback.locator('[data-basic-answer="false"]').click();await fallback.locator('.basic-answer-label').waitFor();
+  await bc.close();
+  const blocked=await browser.newContext({viewport:{width:1366,height:768}});
+  await blocked.addInitScript(()=>{Storage.prototype.getItem=function(){throw new Error('storage disabled')};Storage.prototype.setItem=function(){throw new Error('storage disabled')};Storage.prototype.removeItem=function(){throw new Error('storage disabled')};});
+  const sp=await blocked.newPage();checkPage(sp);await sp.goto(base);await basicRun(sp,7);await sp.locator('#basic-advanced').click();assert.equal(await sp.locator('.choice').count(),4);await sp.reload();assert.equal(await sp.locator('[data-action="start"]').isDisabled(),true);await blocked.close();
+  checks.push('basic: 10 illustrated binary questions; keyboard/double-answer guard; 6 fail, 7 pass, 10 pass; persistence, reset, locked action guard, storage-denied session fallback');
+
   const context = await browser.newContext({ viewport:{ width:1366, height:768 } });
+  await context.addInitScript(() => localStorage.setItem('sensor-quest-basics-v1', JSON.stringify({best:7})));
   const page = await context.newPage(); checkPage(page); await page.goto(base);
   await page.screenshot({ path:'work/v2-title.png' });
   await page.locator('[data-action="book"]').click(); assert.equal(await page.locator('[data-device]').count(), 19);
@@ -128,6 +174,7 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
   await context.close();
   // A controllable monotonic clock verifies deadline and untimed behavior.
   const clockContext = await browser.newContext({ viewport:{ width:1366, height:768 }, reducedMotion:'reduce' });
+  await clockContext.addInitScript(() => localStorage.setItem('sensor-quest-basics-v1', JSON.stringify({best:7})));
   const timed = await clockContext.newPage(); checkPage(timed); await timed.clock.install(); await timed.goto(base); await timed.locator('[data-action="start"]').click();
   assert.equal(await timed.locator('#seconds').innerText(), '30');
   assert.equal(await timed.locator('.question-panel').getAttribute('data-time-phase'), 'blue');
@@ -147,6 +194,7 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
   checks.push('30-second timer and 15/5-second color boundaries, timeout 0, untimed next question, reduced-motion');
   await clockContext.close();
   const missing = await browser.newPage({ viewport:{ width:1366, height:768 } }); checkPage(missing);
+  await missing.addInitScript(() => localStorage.setItem('sensor-quest-basics-v1', JSON.stringify({best:7})));
   await missing.route('**/assets/*.png', route => route.abort()); await missing.goto(base); await missing.locator('[data-action="start"]').click(); await missing.locator('.image-frame.missing').waitFor();
   await missing.locator('[data-choice="best"]').click(); await missing.locator('.selection.optimal').waitFor();
   checks.push('all PNGs missing: caption and mascot fallback, answering still works, subdirectory paths');

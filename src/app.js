@@ -1,3 +1,4 @@
+import { createBasicMode, basicsUnlocked, basicBest, resetBasicProgress } from './basic-mode.js';
 import { questions } from './questions.js';
 import { evaluate, summarize, shuffle } from './engine.js';
 import { devices } from './encyclopedia.js';
@@ -37,11 +38,16 @@ function shell(content, cls = '', active = index) {
   cancelAnimationFrame(scoreFrame);
   app.innerHTML = `<div class="game ${cls}"><header>${brand}<div class="progress" aria-label="全${questions.length}問中、第${active + 1}問">${questions.map((_, i) => `<i class="${i < active ? 'done' : i === active ? 'current' : ''}"></i>`).join('')}</div><div class="top-tools"><button data-action="fullscreen">⛶ 全画面</button><button data-action="settings">⚙ 設定</button></div></header>${content}</div>`;
 }
+const basics = createBasicMode({app, cat, advanced:start, celebrate:answerCelebration});
+function startBasics() {
+  clearInterval(timer); cancelAnimationFrame(scoreFrame); state = 'basics'; setTheme(1); basics.start();
+}
 function title() {
   clearInterval(timer); cancelAnimationFrame(scoreFrame); state = 'title'; setTheme(1);
-  app.innerHTML = `<div class="game title"><div class="title-top"><span>TECHNOLOGY & INGENUITY</span><button data-action="fullscreen">⛶ 全画面表示</button></div><div class="title-art"><div class="board">◉　▥　♩<hr>計 測 と 制 御<br><span>小さな発見から、未来をつくる。</span></div>${cat()}</div><main class="title-copy"><div class="emblem">▂ ▅ █</div><p class="eyebrow">技術の工房へ、ようこそ。</p><h1>SENSOR QUEST</h1><p class="jtitle">センサークエスト</p><p class="subtitle">― 最適なセンサを選べ！ ―</p><p class="intro">できる方法は、ひとつじゃない。<br>条件を読み解き、最適な入力を選ぼう。</p><button class="gold start" data-action="start"><span>▶</span> ゲームを始める</button><div class="title-links"><button data-action="book">▤ 入出力デバイス図鑑</button><button data-action="help">？ 遊び方</button><button data-action="settings">⚙ 設定</button></div><p class="meta">全10問 / 約15分 / 中学校 技術科</p></main><footer>身近な「なぜ？」を、技術で解き明かそう。<span>STAGE 01 身近な技術　→　STAGE 02 再発明</span></footer></div>`;
+  const unlocked = basicsUnlocked();
+  app.innerHTML = `<div class="game mode-title"><div class="title-top"><span>TECHNOLOGY & INGENUITY</span><button data-action="fullscreen">⛶ 全画面表示</button></div><main class="mode-intro"><div>${cat('normal')}</div><section><p class="eyebrow">測る・考える・発明する</p><h1>SENSOR QUEST</h1><p class="jtitle">センサークエスト</p><p>まずは○×で、センサの得意と苦手を知ろう。</p></section></main><div class="mode-cards"><button class="mode-card basic-card" data-action="basic-start"><span class="mode-number">01 / BASIC</span><h2>基礎編 <span>○ ×</span></h2><p>センサの役割を確かめる10問</p><small>時間制限なし ／ 7問以上で応用編へ</small><b>基礎編を始める ›</b></button><button class="mode-card advanced-card" data-action="start" ${unlocked?'':'disabled'}><span class="mode-number">02 / ADVANCED</span><h2>応用編 <span>${unlocked?'解放済み':'🔒'}</span></h2><p>最適なセンサを選ぶ4択・10問</p><small>${unlocked?'身近な技術から、きみの再発明へ':'基礎編で7問以上正解すると遊べます'}</small><b>${unlocked?'応用編を始める ›':'まずは基礎編に挑戦'}</b></button></div><div class="mode-tools"><span>基礎編の最高記録：${basicBest()} / 10問</span><button data-action="book">▤ デバイス図鑑</button><button data-action="help">？ 遊び方</button><button data-action="settings">⚙ 設定</button><button data-action="reset-progress">進捗をリセット</button></div><p class="mode-storage">解放状態はこのブラウザに保存します。共用端末では、交代時に進捗をリセットできます。</p></div>`;
 }
-function start() { answers = []; index = 0; review = false; question(); }
+function start() { if (!basicsUnlocked()) { title(); return; } answers = []; index = 0; review = false; question(); }
 function stageTransition() {
   clearInterval(timer); state = 'transition'; setTheme(2);
   shell(`<main class="panel stage-intro"><section><p class="eyebrow">STAGE 02 / REINVENTION</p><h1>ここからは、きみが発明家。</h1><p class="stage-lead">身近な困りごとに、<br>入力の組み合わせで挑もう。</p><p>ひとつのセンサでは分からないことも、<br>役割を分けると、解決の糸口が見えてくる。</p><div class="stage-principles"><span>何を取得する？</span><b>→</b><span>どう判断する？</span><b>→</b><span>何を動かす？</span></div><p class="ai-note">AIはChromebook等で実行し、結果をmicro:bitへ渡します。<br>micro:bit単体でTeachable Machineは実行できません。</p><button class="gold" data-action="stage-start">再発明のクエストへ　›</button><small>この画面では制限時間は進みません。</small></section><div class="stage-mascot">${cat('think')}<span>増やす前に、役割を考えよう。</span></div></main>`, 'transitioning');
@@ -131,14 +137,14 @@ function reviewList(missed) {
 }
 function showModal(html) { document.querySelector('#modal-content').innerHTML = html; modal.showModal(); }
 function help() {
-  showModal(`<p class="eyebrow">HOW TO PLAY</p><h2>条件を読み、最適な入力を選ぼう。</h2><ol class="help-list"><li>「今回の条件・優先すること」を確認。</li><li>4つから選ぶ。クリック、A〜Dキー、Tab＋Enterが使えます。</li><li>解説の比較タブで4つすべての長所・限界を確認。</li></ol><div class="help-scores"><b>最適：2点</b><b>実現可能：1点</b><b>不適切・時間切れ：0点</b></div><p>全10問・20点満点。最適な入力が複数ある問題では、どちらも2点です。1問30秒。速さによる加点はなく、設定で時間制限をなくせます。第6問の前にステージが切り替わります。</p><p>ボタンも入力装置。AIはカメラやマイク等の情報をモデルで分類する仕組みです。micro:bit単体ではTeachable Machineを実行できず、Chromebook等との連携が必要です。</p>`);
+  showModal(`<p class="eyebrow">HOW TO PLAY</p><h2>基礎編から、応用編へ。</h2><p>基礎編は○×の10問・時間制限なし。7問以上正解で応用編が解放されます。○×はクリック、左右キー、Tab＋Enterで選べます。</p><h3>応用編の遊び方</h3><ol class="help-list"><li>「今回の条件・優先すること」を確認。</li><li>4つから選ぶ。クリック、A〜Dキー、Tab＋Enterが使えます。</li><li>解説の比較タブで4つすべての長所・限界を確認。</li></ol><div class="help-scores"><b>最適：2点</b><b>実現可能：1点</b><b>不適切・時間切れ：0点</b></div><p>応用編は全10問・20点満点。1問30秒。速さによる加点はなく、設定で時間制限をなくせます。第6問の前にステージが切り替わります。</p><p>ボタンも入力装置。AIはカメラやマイク等の情報をモデルで分類する仕組みです。micro:bit単体ではTeachable Machineを実行できず、Chromebook等との連携が必要です。</p>`);
 }
 function book() {
   const groups = [['input', '入力装置・センサ / 11種類'], ['ai', 'AI入力 / 3種類'], ['output', '出力装置 / 5種類']];
   showModal(`<p class="eyebrow">DEVICE FIELD GUIDE</p><h2>入出力デバイス図鑑</h2><p>ボタンとタッチロゴも入力装置。AIは取得した情報を学習済みモデルで分類します。<br>Teachable MachineはChromebook等で実行し、結果をmicro:bitと連携します。</p>${groups.map(([type, title]) => `<h3 class="device-group">${title}</h3><div class="book-grid">${devices.filter(d => d.category === type).map(d => `<article data-device="${d.id}"><h3>${d.name}</h3><p><b>${type === 'output' ? '出力する働き' : '取得する情報'}：</b>${d.information}</p><p><b>分からない：</b>${d.unknown}</p><p><b>使用例：</b>${d.example}</p><p><b>限界・注意：</b>${d.limitation}</p></article>`).join('')}</div>`).join('')}`);
 }
 function settingsModal() {
-  showModal(`<p class="eyebrow">WORKSHOP SETTINGS</p><h2>音量・演出設定</h2><label class="setting"><span>1問30秒の時間制限<small>変更は次の問題から適用</small></span><input id="timed" type="checkbox" ${settings.timed ? 'checked' : ''}></label><label class="setting"><span>アニメーション・演出<small>時間のイルミネーション、解説の枠、猫、結果の演出</small></span><input id="effects" type="checkbox" ${settings.effects ? 'checked' : ''}></label><label class="setting"><span>回答音の音量<small>初期設定はミュート</small></span><input id="volume" type="range" min="0" max="100" value="${settings.volume}"></label><p>設定はこのブラウザに保存します。OSの「動きを減らす」設定も優先します。問題の時計はダイアログ表示中も進みます。</p>`);
+  showModal(`<p class="eyebrow">WORKSHOP SETTINGS</p><h2>音量・演出設定</h2><label class="setting"><span>応用編：1問30秒の時間制限<small>基礎編は常に時間制限なし。変更は応用編の次問から適用</small></span><input id="timed" type="checkbox" ${settings.timed ? 'checked' : ''}></label><label class="setting"><span>アニメーション・演出<small>時間のイルミネーション、解説の枠、猫、結果の演出</small></span><input id="effects" type="checkbox" ${settings.effects ? 'checked' : ''}></label><label class="setting"><span>回答音の音量<small>初期設定はミュート</small></span><input id="volume" type="range" min="0" max="100" value="${settings.volume}"></label><p>設定はこのブラウザに保存します。OSの「動きを減らす」設定も優先します。問題の時計はダイアログ表示中も進みます。</p>`);
 }
 function currentExplanationQuestion() { return questions[review ? reviewIndex : index]; }
 document.querySelector('#close-modal').onclick = () => modal.close();
@@ -155,6 +161,9 @@ document.addEventListener('click', e => {
   const r = e.target.closest('[data-review]');
   if (r) { review = true; reviewIndex = Number(r.dataset.review); modal.close(); explanation(answers[reviewIndex]); return; }
   const action = e.target.closest('[data-action]')?.dataset.action;
+  if (action === 'basic-start') startBasics();
+  if (action === 'reset-progress') showModal('<h2>基礎編の進捗をリセットしますか？</h2><p>最高記録を消し、応用編を未解放に戻します。</p><button data-action="confirm-reset-progress">リセットする</button>');
+  if (action === 'confirm-reset-progress') { resetBasicProgress(); modal.close(); title(); }
   if (action === 'start') start();
   if (action === 'home') title();
   if (action === 'quit') showModal('<h2>タイトルへ戻りますか？</h2><p>今回の回答記録は終了します。</p><button class="gold" data-action="confirm-quit">タイトルへ戻る</button>');
