@@ -297,3 +297,70 @@ body.stage-two.reduce-effects .mission-lights{filter:none}
 .reduce-effects .metal-shine:before,.reduce-effects .results:after,.reduce-effects .explanation-panel:after{animation:none!important}
 @media(prefers-reduced-motion:reduce){.metal-shine:before,.results:after,.explanation-panel:after{animation:none!important}}
 .results>.result-ribbon{z-index:4}
+
+/* A real technology classroom, rather than a fantasy game workshop. */
+:root{color-scheme:light;--font:system-ui,-apple-system,'Noto Sans JP','Yu Gothic',Meiryo,sans-serif}
+body{background:#eee8dc;color:#233f46;font-size:18px}
+.workshop,.stage-two .workshop{background:#e6ddca}
+.workshop-scene{position:absolute;inset:0;background:url('../assets/woodwork-lab.png') center/cover no-repeat}
+.workshop-wash{position:absolute;inset:0;background:linear-gradient(115deg,#fffaf0ed,#fffaf0bf 55%,#e9f4f0d9)}
+body.stage-two{background:#edf4f1;color:#233f46}
+.stage-two .workshop-wash{background:linear-gradient(115deg,#f5fcf5ed,#eaf5f1cc 60%,#f7f7efd9)}
+.brand{font:800 26px/1.25 var(--font);letter-spacing:0;color:#195d58;white-space:nowrap}
+.brand small{display:block;font:600 18px/1.4 var(--font);letter-spacing:0;margin-top:5px;color:#4a6265}
+button,.stage-two button{background:#fffdf7;color:#224a4e;border-color:#8eada9}
+button:hover,.stage-two button:hover{background:#e0f1e9}
+button.gold,.stage-two button.gold{background:linear-gradient(120deg,#1f7c68,#176151);color:#fff;border-color:#9fd5c4;box-shadow:0 4px 0 #2a4d42}
+button.gold:hover,.stage-two button.gold:hover{background:#195d50}
+.panel,.stage-two .panel{background:#fffdf7f5;border-color:#8fb6a9;box-shadow:0 0 0 3px #ffffff77,0 15px 35px #5d4b2a20}
+.tag,.stage-two .tag{color:#316e64}.counter em{color:#526a6a}
+.top-tools button,.bottom-bar button{background:#fffdf5;color:#244e4d}
+.bottom-bar,.keyboard,.stage-two .keyboard,.stage-two .bottom-bar{color:#415f61}
+.conditions,.stage-two .conditions{background:#edf2e4;border-color:#bba15b}.conditions b,.stage-two .conditions b{color:#466c4f}
+.clock,.stage-two .clock{color:#166963}
+.choice,.stage-two .choice{background:linear-gradient(110deg,#fff,#f0f5ef);color:#203f48;border-color:#92afa5;box-shadow:0 3px 0 #b0c2b6}
+.choice:hover,.stage-two .choice:hover{background:#e2efe6;border-color:#397c65}
+.guide p,.stage-two .guide p{color:#365952}.guide strong,.stage-two .guide strong{color:#205747}
+.question-panel .mission-statement,.stage-two .mission-statement{color:#154f4c;background:#edf8ee;text-shadow:none}
+.mission-lights,.stage-two .mission-lights{color:#168459;filter:drop-shadow(0 0 3px #72bb7c66)}
+.mode-title .title-top{color:#365a50;font-family:var(--font);font-size:18px;letter-spacing:0}
+.mode-intro{gap:32px;height:235px;justify-content:center}.lab-hero{width:345px;height:205px;flex:none;overflow:hidden;border-radius:18px;border:3px solid #fff;box-shadow:0 8px 20px #5f523628}
+.lab-hero img{width:100%;height:100%;object-fit:cover}
+.mode-intro h1{font-size:56px;letter-spacing:1px;color:#195d52;margin:8px 0 15px}
+.mode-intro .eyebrow{color:#526947;font-size:20px;letter-spacing:0}.mode-intro p{font-size:20px}
+.lab-topics{display:flex;gap:8px;flex-wrap:wrap}.lab-topics span{padding:6px 12px;border-radius:7px;background:#dbeade;color:#1c6354;font-size:18px;font-weight:700}
+.mode-card{background:#fffdf8eb;border:2px solid #599780;color:#234a42;box-shadow:0 8px 20px #5b4f3020}.mode-card:hover{background:#f1f8eb}
+.advanced-card,.mode-card:disabled:hover{background:#edf2f2;border-color:#93a9ac;color:#364e59}.mode-card:disabled{opacity:.78}
+.mode-number{color:#316c5d;letter-spacing:0}.mode-card b{color:#185f4d}.mode-card:disabled b{color:#526574}
+.mode-tools>span,.mode-storage{color:#385650}
+#app small{font-size:18px}
+#app .mode-number,#app .mode-card small,#app .mode-tools>span,#app .mode-storage,#app .mode-tools button{font-size:18px}
+.mode-card{padding:20px 24px;min-height:225px}.mode-card h2{margin:8px 0}.mode-card b{margin-top:14px}.mode-tools{gap:10px}.mode-storage{line-height:1.5}
+#app .tag,#app .counter em,#app .conditions b,#app .keyboard,#app .bottom-bar,#app .bottom-bar button,#app .top-tools button{font-size:18px}
+#app .choice>span{font-size:20px}#app .guide p{font-size:18px}
+.problem .illustration{height:190px;min-height:190px;max-height:190px}
+.conditions p{font-size:18px;line-height:1.55}
+#app .selection-label,#app .selection p,#app .selected-info,#app .selection .possible-note{font-size:18px}
+#app .ribbon,#app .learning,#app .output-note,#app .cat-caption,#app .assessment,#app .review-needed{font-size:18px}
+#app .best>p{font-size:19px;line-height:1.65}
+.best{overflow-y:auto;overscroll-behavior:contain}.best .output-note{margin-top:12px}
+.option-tabs button span{font-size:16px;white-space:normal;line-height:1.35;max-height:44px}
+.option-detail{font-size:18px;line-height:1.7}.option-detail p{font-size:18px}
+#app .result-actions button{font-size:18px;padding:10px 14px}.assessment{margin:8px 0 0}
+.basic-topic{font-size:21px}.basic-heading,.basic-heading span{font-size:20px}.basic-prompt{font-size:21px}
+#app .basic-visual figcaption{font-size:20px}.basic-visual small{display:none}
+.basic-footer p{font-size:20px;color:#29594c}.basic-footer b{color:#1d5342}
+.basic-game header>button{font-size:20px}.basic-save-note{font-size:18px}.basic-recap summary,.basic-recap p{font-size:20px}
+#app .basic-feedback-cat b{font-size:18px}.pir-diagram figcaption{font-size:18px!important}
+.basic-question{grid-template-columns:240px 1fr}.basic-question h1{font-size:30px}
+#app .finale-medal small{font-size:17px}
+.basic-result-actions button{font-size:20px}
+dialog,.stage-two dialog{color:#233f46;background:#fffdf5;border-color:#81aa95}
+dialog small,dialog .eyebrow,dialog .setting small,dialog .review-row span{font-size:18px;color:#48635c}
+.book-grid article,.stage-two .book-grid article{background:#eff5eb;border-color:#a9bfac}.book-grid h3,.stage-two .book-grid h3{color:#1a6550}.book-grid b,.stage-two .book-grid b{color:#355f51}.book-grid p{font-size:18px}
+.setting{font-size:21px}.help-scores{background:#e3efe1}.title-top button{font-size:18px}
+.option-tabs button span{font-size:18px;max-height:50px}
+#app .stat>span,#app .optimal-count,#app .result-message,#app .basic-save-note,#app .clock small{font-size:18px}
+#app .stat small{font-size:18px}
+.mode-title .title-top>span{font-size:18px;color:#315e51;letter-spacing:0;font-family:var(--font)}
+#app .selection-label strong,#app .eval{font-size:18px}

@@ -18,7 +18,7 @@ async function layout(page, label) {
     if (document.documentElement.scrollHeight > 768) issues.push('page vertical overflow');
     for (const el of document.querySelectorAll('.choice,.selection,.best,.conditions,.rank,.insight,.stage-intro,.problem')) {
       const box = el.getBoundingClientRect();
-      if (el.scrollHeight > el.clientHeight + 2) issues.push(`${el.className}: content ${el.scrollHeight} > ${el.clientHeight}`);
+      if (el.scrollHeight > el.clientHeight + 2 && !['auto','scroll'].includes(getComputedStyle(el).overflowY)) issues.push(`${el.className}: content ${el.scrollHeight} > ${el.clientHeight}`);
       if (box.bottom > 768 || box.right > 1366) issues.push(`${el.className}: outside viewport`);
     }
     return issues;
@@ -101,6 +101,8 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
   const context = await browser.newContext({ viewport:{ width:1366, height:768 } });
   await context.addInitScript(() => localStorage.setItem('sensor-quest-basics-v1', JSON.stringify({best:7})));
   const page = await context.newPage(); checkPage(page); await page.goto(base);
+  assert.equal(await page.locator('.mode-intro h1').innerText(),'センサークイズ');
+  assert.equal(await page.title(),'センサークイズ | micro:bit・センサ・AIを学ぼう');
   await page.screenshot({ path:'work/v2-title.png' });
   await page.locator('[data-action="book"]').click(); assert.equal(await page.locator('[data-device]').count(), 19);
   await page.locator('#close-modal').click(); await page.locator('[data-action="help"]').click(); await page.locator('#close-modal').click();
@@ -135,7 +137,7 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
     if ([0,1,5,8].includes(i)) await page.screenshot({ path:`work/v2-explanation-${i+1}.png` });
     await next(page, i);
   }
-  await page.getByText('クエスト結果', { exact:true }).waitFor();
+  await page.getByText('応用編の結果', { exact:true }).waitFor();
   await page.waitForFunction(score => document.querySelector('#score-value').textContent === String(score), mixedSummary.score);
   assert.ok((await page.locator('.rank').innerText()).includes(mixedSummary.rank)); await layout(page, 'mixed result');
   await page.screenshot({ path:'work/v2-result.png' });
