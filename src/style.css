@@ -142,12 +142,19 @@ button.gold{transition:transform .15s}
 
 /* Emphasize the mission independently of the countdown color. */
 .problem .illustration{height:216px;min-height:216px;max-height:216px}
-.problem .mission-statement{position:relative;isolation:isolate;flex:none;color:#ffe18a;background:#332d20;font-size:26px;font-weight:800;line-height:1.45;margin:12px 0;padding:13px 16px;border-radius:15px;text-shadow:0 1px 3px #0008}
+.problem .mission-statement{position:relative;isolation:isolate;flex:none;color:#fff2be;background:#173b35;font-size:26px;font-weight:800;line-height:1.45;margin:12px 0;padding:13px 16px;border-radius:15px;text-shadow:0 1px 3px #0008}
 .mission-statement>span{position:relative;z-index:1}
-.mission-lights{position:absolute;inset:0;overflow:visible;pointer-events:none;color:#ffd36b;filter:drop-shadow(0 0 4px #ffc84c)}
+.mission-lights{position:absolute;inset:0;overflow:visible;pointer-events:none;color:#a7f3c6;filter:drop-shadow(0 0 4px #86efac)}
 .mission-lights rect{fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-dasharray:2 12;animation:mission-march 12s linear infinite}
 @keyframes mission-march{to{stroke-dashoffset:-140}}
-.stage-two .mission-statement{color:#854000;background:#fff6d7;text-shadow:none}
-.stage-two .mission-lights{color:#b56600;filter:drop-shadow(0 0 3px #e9aa32)}
+.stage-two .mission-statement{color:#194d65;background:#effcf5;text-shadow:none}
+.stage-two .mission-lights{color:#a7f3c6;filter:drop-shadow(0 0 3px #4bbd83)}
 .reduce-effects .mission-lights{filter:none}
 @media(prefers-reduced-motion:reduce){.mission-lights{filter:none}}
+
+/* Controller-style shortcut badges: colors follow A–D positions after shuffle. */
+.choice:nth-child(1){--key-color:#a7edba;--key-border:#44a869}
+.choice:nth-child(2){--key-color:#ffb4bd;--key-border:#cf5e71}
+.choice:nth-child(3){--key-color:#abd7ff;--key-border:#4b91cd}
+.choice:nth-child(4){--key-color:#dfbaff;--key-border:#a26bcd}
+.choice kbd,.stage-two .choice kbd{background:var(--key-color);border:2px solid var(--key-border);color:#172a3b;box-shadow:0 0 0 2px #ffffff12}
