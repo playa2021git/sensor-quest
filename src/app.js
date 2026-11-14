@@ -1,3 +1,4 @@
+import { animateFeedback, stopFeedbackMotion, parallax, stopParallax } from './feedback-motion.js';
 import { modeHeading, animateModeHeadings, successBurst, syncMotionPreference } from './motion.js';
 import { metalShine, finaleEffects, advancedFinale } from './celebrations.js';
 import { createBasicMode, basicsUnlocked, basicBest, resetBasicProgress } from './basic-mode.js';
@@ -33,6 +34,7 @@ function image(q) {
   return `<div class="image-frame" role="img" aria-label="${escape(q.imageAlt)}"><img class="scene ${replacement ? 'individual' : 'scene-sheet'}" src="${replacement || q.image}" data-fallback="scene" data-sheet="${sceneSheets[q.sceneSheet]}" data-tile="${q.sceneTile}" style="--column:${q.sceneTile % 2};--row:${Math.floor(q.sceneTile / 2)}" alt=""><span class="image-caption">${q.imageAlt}</span></div>`;
 }
 function setTheme(stage = 1) {
+  stopParallax();
   app.classList.remove('basic-error-state', 'basic-correct-state');
   document.body.classList.toggle('stage-two', stage === 2);
   document.body.classList.toggle('reduce-effects', !effectsEnabled());
@@ -50,6 +52,7 @@ function title() {
   const unlocked = basicsUnlocked();
   app.innerHTML = `<div class="game mode-title"><div class="title-top"><span>中学校 技術科 ／ 計測と制御</span><button data-action="fullscreen">⛶ 全画面表示</button></div><div class="title-layout"><figure class="title-photo-cat"><img src="assets/cat-photo-devices.png" alt="黒い作業服と安全ヘルメットの実写風三毛猫。片手にmicro:bit、もう片手にChromebookを持っている生成イメージ" onerror="this.closest('figure').remove()"></figure><div class="title-main"><main class="mode-intro"><div class="lab-hero"><img src="assets/woodwork-lab.png" alt="木工室の作業台でmicro:bitやセンサ、AIの学習に取り組む教材用イメージ"></div><section><p class="eyebrow">木工室から、プログラミングをはじめよう。</p><h1>センサークイズ</h1><p class="lab-topics"><span>micro:bit</span><span>センサ</span><span>AI / Teachable Machine</span></p><p>測って、考えて、プログラムで動かそう。</p></section></main><div class="mode-cards"><button class="mode-card basic-card" data-action="basic-start"><span class="mode-number">01 / BASIC</span><h2>${modeHeading("基礎編")} <span>○ ×</span></h2><p>センサの役割を確かめる10問</p><small>時間制限なし ／ 7問以上で応用編へ</small><b>基礎編を始める ›</b></button><button class="mode-card advanced-card" data-action="start" ${unlocked?'':'disabled'}><span class="mode-number">02 / ADVANCED</span><h2>${modeHeading("応用編")} <span>${unlocked?'解放済み':'🔒'}</span></h2><p>最適なセンサを選ぶ4択・10問</p><small>${unlocked?'身近な技術から、きみの再発明へ':'基礎編で7問以上正解すると遊べます'}</small><b>${unlocked?'応用編を始める ›':'まずは基礎編に挑戦'}</b></button></div></div></div><div class="mode-tools"><span>基礎編の最高記録：${basicBest()} / 10問</span><button data-action="book">▤ デバイス図鑑</button><button data-action="help">？ 遊び方</button><button data-action="settings">⚙ 設定</button><button data-action="reset-progress">進捗をリセット</button></div><p class="mode-storage">解放状態はこのブラウザに保存します。共用端末では、交代時に進捗をリセットできます。</p></div>`;
   animateModeHeadings(app);
+  parallax(app);
 }
 function start() { if (!basicsUnlocked()) { title(); return; } answers = []; index = 0; review = false; question(); }
 function stageTransition() {
@@ -79,6 +82,7 @@ function answer(id) {
   answers.push(evaluate(questions[index], id));
   playAnswerSound(answers.at(-1).score);
   explanation(answers.at(-1));
+  animateFeedback(app.querySelector(".explanation-panel"), answers.at(-1).evaluation === "optimal");
   answerCelebration(answers.at(-1).evaluation);
 }
 function answerCelebration(evaluation) {
@@ -157,10 +161,10 @@ document.addEventListener('input', e => {
   if (!['timed', 'effects', 'volume'].includes(e.target.id)) return;
   settings[e.target.id] = e.target.id === 'volume' ? Number(e.target.value) : e.target.checked;
   document.body.classList.toggle('reduce-effects', !effectsEnabled());
-  syncMotionPreference();
+  syncMotionPreference(); stopFeedbackMotion();
   try { localStorage.setItem('sensor-quest-settings', JSON.stringify(settings)); } catch { /* optional */ }
 });
-motionPreference.addEventListener('change', () => { document.body.classList.toggle('reduce-effects', !effectsEnabled()); syncMotionPreference(); });
+motionPreference.addEventListener('change', () => { document.body.classList.toggle('reduce-effects', !effectsEnabled()); syncMotionPreference(); stopFeedbackMotion(); });
 document.addEventListener('click', e => {
   const c = e.target.closest('[data-choice]'); if (c) { answer(c.dataset.choice); return; }
   const option = e.target.closest('[data-option]'); if (option) { optionDetail(currentExplanationQuestion(), option.dataset.option); return; }
