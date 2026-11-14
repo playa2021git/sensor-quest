@@ -20,7 +20,7 @@ export function createBasicMode({app, cat, advanced, celebrate}) {
   }
   function show() {
     phase='question';const q=basicQuestions[index];
-    frame(`<main class="basic-board"><div class="basic-heading"><span>基礎編</span><b>第 ${index+1} 問 / 10問</b><span>時間制限なし</span></div><div class="basic-question">${visual(q)}<section><p class="basic-topic">${q.title}</p><h1>${esc(q.statement)}</h1><p class="basic-prompt">正しいと思ったら ○、違うと思ったら ×</p></section></div><div class="binary-choices"><button class="binary yes" data-basic-answer="true" aria-label="○ 正しい"><strong>○</strong><span>正しい <kbd>←</kbd></span></button><button class="binary no" data-basic-answer="false" aria-label="× 違う"><strong>×</strong><span>違う <kbd>→</kbd></span></button></div></main><footer class="basic-footer">${cat('think')}<p>何を測る？ 何は分からない？<br><b>センサの役割を確かめよう。</b></p></footer>`);
+    frame(`<main class="basic-board"><div class="basic-heading"><span>基礎編</span><b>第 ${index+1} 問 / 10問</b><span>時間制限なし</span></div><div class="basic-question">${visual(q)}<section><p class="basic-topic">${q.title}</p><h1>${esc(q.statement)}</h1><p class="basic-prompt">正しいと思ったら ○、違うと思ったら ×</p></section><div class="basic-question-mascot">${cat('think')}</div></div><div class="binary-choices"><button class="binary yes" data-basic-answer="true" aria-label="○ 正しい"><strong>○</strong><span>正しい <kbd>←</kbd></span></button><button class="binary no" data-basic-answer="false" aria-label="× 違う"><strong>×</strong><span>違う <kbd>→</kbd></span></button></div></main><footer class="basic-footer"><p>何を測る？ 何は分からない？ <b>センサの役割を確かめよう。</b></p></footer>`);
     app.querySelectorAll('[data-basic-answer]').forEach(button=>button.onclick=()=>answer(button.dataset.basicAnswer==='true'));
   }
   function answer(value) {

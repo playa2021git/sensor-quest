@@ -371,3 +371,48 @@ dialog small,dialog .eyebrow,dialog .setting small,dialog .review-row span{font-
 .title-photo-cat img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 7px 6px #564a3833)}
 .mode-intro section{min-width:0}
 .mode-intro .lab-hero{width:320px;height:200px}
+
+/* Photo-style guides are larger, with dedicated space instead of overlaps. */
+.mode-intro h1{font-size:72px;font-weight:900;letter-spacing:0;line-height:1.1}
+.mode-intro .lab-hero{width:285px;height:190px}
+.title-photo-cat{width:205px;height:255px}.mode-intro{height:265px;gap:18px}
+.mode-intro .eyebrow{font-size:20px}.mode-intro p{font-size:20px}
+.brand{font-size:32px}
+.basic-question{grid-template-columns:200px minmax(0,1fr) 140px;gap:24px}
+.basic-question-mascot .cat{width:140px;height:210px}
+.basic-footer{min-height:42px;flex:none}.basic-footer p{margin:8px 0;line-height:1.5}
+.basic-feedback-cat .cat{width:192px;height:288px}
+.basic-explain-grid,.has-diagram .basic-explain-grid{grid-template-columns:370px minmax(0,1fr)}
+.basic-feedback-aside,.has-diagram .basic-feedback-aside{display:grid;grid-template-columns:150px 192px;gap:16px;align-items:start}
+.basic-feedback-aside .basic-visual{width:150px}
+.basic-feedback-cat{align-self:start}
+.basic-feedback-aside .pir-diagram{grid-column:1/-1}
+.has-diagram .pir-diagram svg{height:80px}
+.has-diagram .pir-diagram figcaption{line-height:1.4}
+.answer-area{display:grid;grid-template-columns:minmax(0,1fr) 176px;grid-template-rows:auto 1fr auto;gap:10px 16px}
+.answer-heading{grid-column:1/-1;margin-bottom:4px}.choices{grid-column:1;grid-row:2;align-content:start}
+.keyboard{grid-column:1;grid-row:3;line-height:1.5}
+.guide{grid-column:2;grid-row:2/4;flex-direction:column;justify-content:center;height:auto;margin:0;gap:10px}
+.guide .cat{width:176px;height:264px}.guide p{margin:0;line-height:1.65;text-align:center}
+.choice{min-height:64px}.choice>span:not(.arrow){min-width:0;overflow-wrap:anywhere}
+.explanation-panel{display:grid;grid-template-columns:208px minmax(0,1fr);grid-template-rows:auto 174px minmax(0,1fr);gap:14px}
+.explanation-panel>.panel-heading{grid-column:1/-1}.explanation-mascot{grid-column:1;grid-row:2/4;align-self:center}
+.explanation-mascot .cat{width:208px;height:312px}
+.explain-top{grid-column:2;grid-row:2;grid-template-columns:160px minmax(0,1fr);gap:14px}
+.explain-top .illustration{width:160px;height:174px}.explain-top .image-frame{width:160px;height:107px}
+.selection{min-height:174px;max-height:174px;overflow-y:auto}
+.explain-bottom{grid-column:2;grid-row:3;min-height:0}.explain-footer{justify-content:space-between}
+.basic-finale-hero>.cat{width:208px;height:312px}
+.score-area{display:grid;grid-template-columns:216px minmax(0,1fr);grid-template-rows:auto auto auto auto auto;gap:4px 12px;align-content:start;padding-right:22px}
+.score-area>p:first-child{grid-column:1/-1;grid-row:1}
+.score-area>.score{grid-column:2;grid-row:2;font-size:82px;line-height:1.15}
+.score-area>.optimal-count{grid-column:2;grid-row:3;margin:3px 0}
+.score-area>.rank{grid-column:2;grid-row:4;flex-direction:column;gap:6px;padding:20px 8px 9px;margin:20px 0 5px}
+.score-area>.rank strong{font-size:54px}.score-area>.rank span{font-size:18px;line-height:1.5}
+.score-area>.rank small{padding:5px 12px}
+.result-cat{position:static;grid-column:1;grid-row:2/5;width:216px;height:324px;align-self:center;margin:0}
+.result-cat .cat{width:216px;height:324px}
+.score-area>.result-message{grid-column:1/-1;grid-row:5;padding:0;margin:4px 0;line-height:1.6}
+.stage-mascot .cat{width:310px;height:465px}.stage-mascot>span:last-child{margin-top:0}
+.explain-footer .cat-caption{position:static;width:auto;max-width:55%;color:#365d50;pointer-events:none}
+.explain-footer .next{margin-left:auto}
