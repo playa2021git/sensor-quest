@@ -1,0 +1,42 @@
+/* Color, weight and silhouette distinguish the two learning modes even at rest. */
+.mode-card{position:relative;isolation:isolate;overflow:hidden;border-width:5px;border-radius:24px!important;box-shadow:0 2px 6px #1c233314;transition:transform .3s cubic-bezier(.215,.61,.355,1),box-shadow .3s,border-color .3s!important}
+.mode-card.basic-card{--mode-ink:#07563f;--mode-bright:#008b56;background:linear-gradient(135deg,#edffdb,#c7f1d7);border-color:#188653;color:#104b37}
+.mode-card.advanced-card,.mode-card.advanced-card:disabled:hover{--mode-ink:#502184;--mode-bright:#8e35c7;background:linear-gradient(135deg,#f2e5ff,#e1d7ff 60%,#ffe9b8);border-color:#8652b6;color:#45246b}
+.mode-card.advanced-card:disabled{opacity:1;border-style:double;border-width:7px;cursor:not-allowed}
+.mode-card .mode-number{display:inline-block;border-radius:30px;padding:5px 12px;background:#136742;color:#fff;font-weight:850}
+.advanced-card .mode-number{background:#613090;color:#fff2b8}
+.mode-card h2{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:38px;font-weight:950;color:var(--mode-ink);margin:18px 0}
+.mode-word{display:inline-flex;white-space:nowrap;float:none!important;font-size:inherit!important;line-height:1.4}
+.mode-word i{font-style:normal;display:inline-block;transform-origin:50% 100%}
+.mode-card h2>span:last-child:not(.mode-word){font-size:22px;white-space:nowrap}
+.mode-card b{padding:10px 12px;border-radius:12px;background:#137247;color:white;box-shadow:0 4px 0 #09512f;margin-top:18px}
+.advanced-card b{background:#66339b;color:white;box-shadow:0 4px 0 #43216d}
+.mode-card:disabled b{background:#e8d8f7;color:#502a75;box-shadow:none;border:1px dashed #9669b4}
+/* Motion Prompt #081 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#081 */
+.mode-card:not(:disabled):is(:hover,:focus-visible){transform:translateY(-10px);box-shadow:0 12px 22px #1c233338}
+/* Motion Prompt #022 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#022
+   2.35s cycle, sweep .45–1.5s; quadratic ease approximated by cubic-bezier(.455,.03,.515,.955). */
+.mode-card::after{content:'';position:absolute;pointer-events:none;z-index:2;top:-60%;bottom:-60%;width:29%;background:linear-gradient(90deg,transparent,#ffffffb8,transparent);transform:translateX(-160%) rotate(24deg);animation:mode-sweep 2.35s cubic-bezier(.455,.03,.515,.955) infinite}
+@keyframes mode-sweep{0%,19.149%{left:-32.5%;opacity:0}20%{opacity:1}63.83%{left:132.5%;opacity:1}64%,100%{left:132.5%;opacity:0}}
+/* Additional original entrance, interaction and reward choreography. */
+.title-photo-cat img{animation:mascot-arrive .8s cubic-bezier(.16,1,.3,1) both,mascot-float 4s 1s ease-in-out infinite;transform-origin:center bottom}
+@keyframes mascot-arrive{from{opacity:0;transform:translateX(-65px) rotate(-8deg) scale(.85)}to{opacity:1;transform:none}}
+@keyframes mascot-float{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-9px) rotate(1deg)}}
+.mode-intro h1{animation:title-arrive .7s .12s cubic-bezier(.16,1,.3,1) both}
+@keyframes title-arrive{from{opacity:0;transform:translateY(20px);filter:blur(8px)}to{opacity:1;transform:none;filter:blur(0)}}
+.lab-topics span{animation:chip-enter .5s cubic-bezier(.34,1.56,.64,1) both}.lab-topics span:nth-child(2){animation-delay:.12s}.lab-topics span:nth-child(3){animation-delay:.24s}
+@keyframes chip-enter{from{opacity:0;transform:scale(.6) translateY(15px)}to{opacity:1;transform:none}}
+.choice,.binary,.gold,.mode-tools button{transition:transform .2s,box-shadow .2s,background .2s!important}
+.choice:is(:hover,:focus-visible){transform:translateX(6px);box-shadow:-5px 0 0 #148b72,0 8px 20px #185b4826}
+.binary:is(:hover,:focus-visible),.gold:is(:hover,:focus-visible),.mode-tools button:is(:hover,:focus-visible){transform:translateY(-4px) scale(1.025);box-shadow:0 9px 18px #215a4430}
+.binary:active,.choice:active,.gold:active{transform:scale(.96)}
+.choices .choice{animation:choice-arrive .4s cubic-bezier(.16,1,.3,1) both}.choices .choice:nth-child(2){animation-delay:.06s}.choices .choice:nth-child(3){animation-delay:.12s}.choices .choice:nth-child(4){animation-delay:.18s}
+@keyframes choice-arrive{from{opacity:0;translate:20px 0}to{opacity:1;translate:0 0}}
+.answer-correct .basic-answer-label,.feedback-optimal .selection-label strong{animation:reward-pop .65s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes reward-pop{from{scale:.7;opacity:0}60%{scale:1.06;opacity:1}to{scale:1;opacity:1}}
+.success-canvas{position:fixed;pointer-events:none;z-index:35;top:8%;left:50%;width:min(800px,100vw);height:auto;transform:translateX(-50%)}
+.answer-burst{pointer-events:none!important}.answer-burst i{width:12px;height:22px;box-shadow:0 0 10px currentColor}.answer-burst strong{text-shadow:0 5px 0 #7c441f,0 0 28px #ffe8a5}
+.reduce-effects *, .reduce-effects *::before,.reduce-effects *::after{animation:none!important;transition:none!important}
+.reduce-effects .mode-card::after{display:none}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.mode-card::after{display:none}}
+@media(max-width:700px){.mode-card h2{font-size:28px}.mode-card h2>span:last-child:not(.mode-word){font-size:16px}.mode-card b{font-size:18px}}
