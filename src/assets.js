@@ -6,7 +6,7 @@ export const sceneSheets = {
   v3stage1: 'assets/scenes-v3-stage1.png',
   v3stage2: 'assets/scenes-v3-stage2.png'
 };
-export const catSheet = 'assets/cat-manga.png';
+export const catSheet = 'assets/cat-worksite.png';
 export const catPoses = {
   normal: { tile: 0, suggestedFile: 'assets/cat-normal.webp' },
   success: { tile: 1, suggestedFile: 'assets/cat-success.webp' },
