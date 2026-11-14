@@ -50,6 +50,7 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
     await page.locator('[data-action="basic-start"]').click();
     for(let i=0;i<10;i++) {
       assert.equal(await page.locator('[data-basic-answer]').count(),2);
+      assert.equal(await page.locator('#app.basic-error-state, #app.basic-correct-state').count(),0);
       assert.equal(await page.locator('#seconds').count(),0);
       await page.waitForFunction(()=>{const img=document.querySelector('.basic-sprite img');return img&&img.complete&&img.naturalWidth>0});
       const over=await page.evaluate(()=>document.documentElement.scrollHeight>768||document.querySelector('.basic-board').getBoundingClientRect().bottom>768);
@@ -59,6 +60,13 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
       if(i===0) {await page.keyboard.press(value?'ArrowLeft':'ArrowRight');await page.keyboard.press(value?'ArrowLeft':'ArrowRight');}
       else await page.locator(`[data-basic-answer="${value}"]`).click();
       await page.locator('.basic-answer-label').waitFor();
+      const correct = value === basicQuestions[i].answer;
+      assert.equal(await page.locator(correct ? '.answer-correct' : '.answer-incorrect').count(), 1);
+      assert.equal(await page.locator(`.basic-feedback-cat .cat.${correct?'success':'sad'}`).count(),1);
+      assert.equal(await page.locator('.basic-explain-text').evaluate(el=>getComputedStyle(el).fontSize),'26px');
+      assert.equal(await page.locator('.basic-note').evaluate(el=>getComputedStyle(el).fontSize),'21px');
+      const nextBox=await page.locator('.basic-next').boundingBox();assert.ok(nextBox.y+nextBox.height<=768,'next action remains visible');
+      if(!correct && i===0) {await page.screenshot({path:'work/basic-warning.png'});assert.equal(await page.locator('.answer-status-border').evaluate(el=>getComputedStyle(el).animationName),'caution-flow');}
       assert.ok((await page.locator('.basic-answer-label').innerText()).includes(`正解：${basicQuestions[i].answer?'○':'×'}`));
       if(i===0) {assert.equal(await page.locator('.pir-diagram').count(),1);await page.screenshot({path:'work/basic-pir-explanation.png'});}
       await page.locator('.basic-next').click();
@@ -79,12 +87,12 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
   // Even invoking the advanced action on a tampered button cannot skip the gate.
   await bp.locator('[data-action="start"]').evaluate(el=>el.disabled=false);await bp.locator('[data-action="start"]').click();assert.equal(await bp.locator('.choice').count(),0);
   await basicRun(bp,10);
-  const fallback=await bc.newPage();checkPage(fallback);await fallback.route('**/assets/basic-sensors.png',route=>route.abort());await fallback.goto(base);await fallback.locator('[data-action="basic-start"]').click();await fallback.locator('.basic-image-missing').waitFor();await fallback.locator('[data-basic-answer="false"]').click();await fallback.locator('.basic-answer-label').waitFor();
+  const fallback=await bc.newPage();checkPage(fallback);await fallback.route('**/assets/basic-sensors.png',route=>route.abort());await fallback.emulateMedia({reducedMotion:'reduce'});await fallback.goto(base);await fallback.locator('[data-action="basic-start"]').click();await fallback.locator('.basic-image-missing').waitFor();await fallback.locator('[data-basic-answer="true"]').click();await fallback.locator('.basic-answer-label').waitFor();assert.equal(await fallback.evaluate(()=>document.getAnimations().length),0);
   await bc.close();
   const blocked=await browser.newContext({viewport:{width:1366,height:768}});
   await blocked.addInitScript(()=>{Storage.prototype.getItem=function(){throw new Error('storage disabled')};Storage.prototype.setItem=function(){throw new Error('storage disabled')};Storage.prototype.removeItem=function(){throw new Error('storage disabled')};});
   const sp=await blocked.newPage();checkPage(sp);await sp.goto(base);await basicRun(sp,7);await sp.locator('#basic-advanced').click();assert.equal(await sp.locator('.choice').count(),4);await sp.reload();assert.equal(await sp.locator('[data-action="start"]').isDisabled(),true);await blocked.close();
-  checks.push('basic: 10 illustrated binary questions; keyboard/double-answer guard; 6 fail, 7 pass, 10 pass; persistence, reset, locked action guard, storage-denied session fallback');
+  checks.push('basic: 10 illustrated binary questions; red warning/moving caution border, correct/sad cats, 26px/21px explanations, reduced motion, keyboard/double-answer guard; 6 fail, 7 pass, 10 pass; persistence, reset, locked action guard, storage-denied session fallback');
 
   const context = await browser.newContext({ viewport:{ width:1366, height:768 } });
   await context.addInitScript(() => localStorage.setItem('sensor-quest-basics-v1', JSON.stringify({best:7})));

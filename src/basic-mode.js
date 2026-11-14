@@ -9,10 +9,13 @@ export function createBasicMode({app, cat, advanced, celebrate}) {
   let index=0, answers=[], phase='';
   const esc = value => String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function frame(content) {
+    app.classList.toggle('basic-error-state', phase === 'explanation' && answers.at(-1) !== basicQuestions[index].answer);
+    app.classList.toggle('basic-correct-state', phase === 'explanation' && answers.at(-1) === basicQuestions[index].answer);
     app.innerHTML=`<div class="game basic-game"><header><div class="brand">SENSOR<br>QUEST<small>基礎編 ○×チャレンジ</small></div><div class="basic-progress">${basicQuestions.map((_,i)=>`<i class="${i<index?'done':i===index?'current':''}"></i>`).join('')}</div><button data-action="home">⌂ タイトルへ</button></header>${content}</div>`;
   }
   function visual(q) {
-    return `<figure class="basic-visual"><div class="basic-sprite" role="img" aria-label="${esc(q.sensor)}の${q.tile===0?'外観':'概念図'}"><img src="assets/basic-sensors.png" style="--col:${q.tile%4};--row:${Math.floor(q.tile/4)}" alt="" onerror="this.parentElement.classList.add('basic-image-missing');this.remove()"></div><figcaption>${esc(q.sensor)}<small>生成した教材用イメージ</small></figcaption></figure>`;
+    const columns=q.imageColumns||4, rows=q.imageRows||3, tile=q.imageTile??q.tile;
+    return `<figure class="basic-visual"><div class="basic-sprite" role="img" aria-label="${esc(q.sensor)}の${q.tile===0?'外観':'概念図'}"><img src="${q.image||'assets/basic-sensors.png'}" style="--col:${tile%columns};--row:${Math.floor(tile/columns)};--columns:${columns};--rows:${rows}" alt="" onerror="this.parentElement.classList.add('basic-image-missing');this.remove()"></div><figcaption>${esc(q.sensor)}<small>生成した教材用イメージ</small></figcaption></figure>`;
   }
   function show() {
     phase='question';const q=basicQuestions[index];
@@ -21,7 +24,7 @@ export function createBasicMode({app, cat, advanced, celebrate}) {
   }
   function answer(value) {
     if(phase!=='question')return;phase='explanation';answers.push(value);const q=basicQuestions[index], correct=value===q.answer;
-    frame(`<main class="basic-board basic-explanation"><div class="basic-heading"><span>基礎編 / 解説</span><b>第 ${index+1} 問 / 10問</b></div><div class="basic-answer-label ${correct?'correct':'incorrect'}">${correct?'正解！':'ここを確認しよう'}<span>あなたの回答：${value?'○':'×'} ／ 正解：${q.answer?'○':'×'}</span></div><div class="basic-explain-grid">${visual(q)}<section><h1>${esc(q.title)}</h1><p class="basic-explain-text">${esc(q.explanation)}</p><p class="basic-note">${esc(q.note)}</p>${q.diagram?`<figure class="pir-diagram"><svg viewBox="0 0 520 125" role="img" aria-label="白いレンズの正面から検知範囲が広がる模式図。横を通る動きも範囲に入る。"><path d="M65 65 L430 10 Q500 65 430 115 Z" fill="#c5f2df" stroke="#16785b" stroke-width="2" stroke-dasharray="7 5"/><rect x="12" y="40" width="38" height="50" rx="5" fill="#286452"/><path d="M45 40 A25 25 0 0 1 45 90" fill="#fff" stroke="#6b8391" stroke-width="3"/><text x="150" y="55">レンズの前に広がる範囲</text><text x="150" y="82">横を通る動きも検知の対象</text></svg><figcaption>範囲の模式図。実際の角度・距離は機種によって異なります。</figcaption></figure>`:''}</section></div><button class="gold basic-next">${index===9?'結果を見る':'次の問題へ'} ›</button></main>`);
+    frame(`<main class="basic-board basic-explanation ${correct?'answer-correct':'answer-incorrect'} ${q.diagram?'has-diagram':''}"><div class="answer-status-border" aria-hidden="true"></div><div class="basic-heading"><span>基礎編 / 解説</span><b>第 ${index+1} 問 / 10問</b></div><div class="basic-answer-label ${correct?'correct':'incorrect'}">${correct?'正解！':'ここを確認しよう'}<span>あなたの回答：${value?'○':'×'} ／ 正解：${q.answer?'○':'×'}</span></div><div class="basic-explain-grid"><aside class="basic-feedback-aside">${visual(q)}<div class="basic-feedback-cat">${cat(correct?'success':'sad')}<b>${correct?'その調子！':'いっしょに確認しよう'}</b></div>${q.diagram?`<figure class="pir-diagram"><svg viewBox="0 0 320 155" role="img" aria-label="白いレンズの正面から左右にも広く検知範囲が広がる模式図。赤外線を発射する図ではありません。"><path d="M160 126 L15 35 Q160 -25 305 35 Z" fill="#c5f2df" stroke="#16785b" stroke-width="3" stroke-dasharray="9 6"/><rect x="136" y="140" width="48" height="12" rx="5" fill="#286452"/><path d="M136 140 A24 18 0 0 1 184 140" fill="#fff" stroke="#6b8391" stroke-width="3"/></svg><figcaption>レンズの前に左右へ広がる範囲の模式図。角度・距離は機種によって異なります。</figcaption></figure>`:''}</aside><section><h1>${esc(q.title)}</h1><p class="basic-explain-text">${esc(q.explanation)}</p><p class="basic-note">${esc(q.note)}</p></section></div><button class="gold basic-next">${index===9?'結果を見る':'次の問題へ'} ›</button></main>`);
     app.querySelector('.basic-next').onclick=()=>{index++;if(index===10)result();else show();};
     if(correct)celebrate('optimal');
   }

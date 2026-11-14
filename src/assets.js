@@ -6,12 +6,13 @@ export const sceneSheets = {
   v3stage1: 'assets/scenes-v3-stage1.png',
   v3stage2: 'assets/scenes-v3-stage2.png'
 };
-export const catSheet = 'assets/cat-relaxed.png';
+export const catSheet = 'assets/cat-calico.png';
 export const catPoses = {
   normal: { tile: 0, suggestedFile: 'assets/cat-normal.webp' },
   success: { tile: 1, suggestedFile: 'assets/cat-success.webp' },
   explain: { tile: 2, suggestedFile: 'assets/cat-explain.webp' },
   think: { tile: 3, suggestedFile: 'assets/cat-think.webp' },
+  sad: { tile: 5, suggestedFile: 'assets/cat-sad.webp' },
   result: { tile: 4, suggestedFile: 'assets/cat-result.webp' }
 };
 

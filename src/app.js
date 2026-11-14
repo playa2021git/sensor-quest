@@ -24,13 +24,14 @@ const escape = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', 
 function cat(pose = 'normal') {
   const config = catPoses[pose] || catPoses.normal;
   const replacement = catReplacements[pose];
-  return `<span class="cat ${pose}" role="img" aria-label="黒い作業服と緑十字・安全第一の黄色いヘルメットを着けた、ゆるい表情の案内猫"><img class="${replacement ? 'cat-individual' : 'cat-sheet'}" src="${replacement || catSheet}" data-fallback="cat" data-tile="${config.tile}" style="--column:${config.tile % 3};--row:${Math.floor(config.tile / 3)}" alt=""></span>`;
+  return `<span class="cat ${pose}" role="img" aria-label="黒い作業服と緑十字・安全第一の黄色いヘルメットを着けた、ゆるい表情の三毛の案内猫"><img class="${replacement ? 'cat-individual' : 'cat-sheet'}" src="${replacement || catSheet}" data-fallback="cat" data-tile="${config.tile}" style="--column:${config.tile % 3};--row:${Math.floor(config.tile / 3)}" alt=""></span>`;
 }
 function image(q) {
   const replacement = sceneReplacements[q.id];
   return `<div class="image-frame" role="img" aria-label="${escape(q.imageAlt)}"><img class="scene ${replacement ? 'individual' : 'scene-sheet'}" src="${replacement || q.image}" data-fallback="scene" data-sheet="${sceneSheets[q.sceneSheet]}" data-tile="${q.sceneTile}" style="--column:${q.sceneTile % 2};--row:${Math.floor(q.sceneTile / 2)}" alt=""><span class="image-caption">${q.imageAlt}</span></div>`;
 }
 function setTheme(stage = 1) {
+  app.classList.remove('basic-error-state', 'basic-correct-state');
   document.body.classList.toggle('stage-two', stage === 2);
   document.body.classList.toggle('reduce-effects', !effectsEnabled());
 }
