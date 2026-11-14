@@ -440,3 +440,31 @@ dialog small,dialog .eyebrow,dialog .setting small,dialog .review-row span{font-
 @keyframes finale-cat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
 .reduce-effects .advanced-finale{display:none}
 @media(prefers-reduced-motion:reduce){.advanced-finale{display:none}}
+
+/* Landing mascot spans the introduction and both mode buttons. */
+.mode-title{width:100%;max-width:1536px;min-width:0}
+.title-layout{display:grid;grid-template-columns:minmax(240px,30%) minmax(0,1fr);gap:28px;align-items:center}
+.title-layout>.title-photo-cat{width:100%;height:540px;align-self:stretch}
+.title-main{min-width:0;display:flex;flex-direction:column;gap:20px}
+.title-main .mode-intro{height:auto;min-height:220px;gap:20px}
+.title-main .lab-hero{width:30%;height:180px}
+.title-main .mode-intro h1{font-size:clamp(40px,4.7vw,68px)}
+.title-main .mode-cards{gap:18px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.title-main .mode-card{padding:20px;min-height:230px}
+@media(max-width:1050px){
+  .title-layout{grid-template-columns:minmax(200px,28%) minmax(0,1fr);gap:18px}
+  .title-main .mode-intro{flex-direction:column;align-items:flex-start;gap:12px}
+  .title-main .lab-hero{width:100%;height:150px}
+  .title-layout>.title-photo-cat{height:100%;min-height:540px}
+  .mode-title{height:auto;min-height:100dvh}
+}
+@media(max-width:700px){
+  .mode-title{padding:18px}
+  .title-layout{grid-template-columns:minmax(110px,30%) minmax(0,1fr);gap:12px;align-items:start}
+  .title-layout>.title-photo-cat{height:440px;min-height:0;align-self:start}
+  .title-main .mode-intro h1{font-size:clamp(28px,6vw,40px)}
+  .title-main .mode-intro .eyebrow,.title-main .mode-intro p{font-size:16px}
+  .title-main .mode-cards{grid-template-columns:1fr}
+  .title-main .mode-card{min-height:0;padding:16px}
+  .title-main .mode-card h2{font-size:28px}
+}
