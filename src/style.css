@@ -416,3 +416,27 @@ dialog small,dialog .eyebrow,dialog .setting small,dialog .review-row span{font-
 .stage-mascot .cat{width:310px;height:465px}.stage-mascot>span:last-child{margin-top:0}
 .explain-footer .cat-caption{position:static;width:auto;max-width:55%;color:#365d50;pointer-events:none}
 .explain-footer .next{margin-left:auto}
+
+/* Contrast a deliberately wrong narrow-line claim with the broad PIR diagram. */
+.pir-narrow-diagram{margin:12px 0 0;border:2px dashed #a75b64;border-radius:12px;background:#fff6f4;padding:8px 12px}
+.pir-narrow-diagram figcaption{font-size:20px;font-weight:800;color:#933149}
+.pir-narrow-diagram svg{display:block;width:100%;height:90px}
+.pir-narrow-diagram text{font:20px var(--font);fill:#6c3f4c}
+.pir-narrow-diagram.revealed{margin-top:18px;border-style:solid}
+/* Advanced finale: six repeating fireworks and a pair of slow stage lights. */
+.advanced-finale{position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none;z-index:0}
+.advanced-spotlights{position:absolute;inset:-60%;background:conic-gradient(from 30deg,transparent 0deg 65deg,#f1c85d40 70deg,transparent 90deg 240deg,#c5d8fa55 255deg,transparent 275deg);animation:advanced-spotlight 16s ease-in-out infinite alternate}
+@keyframes advanced-spotlight{from{transform:rotate(-20deg)}to{transform:rotate(35deg)}}
+.finale-firework{position:absolute;left:var(--fx);top:var(--fy);width:1px;height:1px}
+.finale-firework b{position:absolute;width:4px;height:15px;border-radius:5px;background:hsl(var(--hue) 70% 50%);box-shadow:0 0 7px #ffe1a1;animation:finale-firework 4.6s ease-out infinite;animation-delay:var(--start);opacity:0}
+@keyframes finale-firework{0%{opacity:0;transform:rotate(var(--ray)) translateY(0) scale(.3)}12%{opacity:.9}42%{opacity:0;transform:rotate(var(--ray)) translateY(-115px) scale(.3)}100%{opacity:0;transform:rotate(var(--ray)) translateY(-115px) scale(.3)}}
+.advanced-results>.finale-effects>i{width:13px;height:22px;animation-duration:3s}
+.advanced-results>.finale-effects .finale-rays{background:repeating-conic-gradient(#d9a6302b 0deg 10deg,transparent 10deg 23deg)}
+.advanced-results:after{padding:16px;inset:-9px;box-shadow:0 0 30px #ffe59966}
+.advanced-results .score{animation:advanced-score-in 1s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes advanced-score-in{from{transform:scale(.55)}to{transform:scale(1)}}
+.advanced-results .rank{box-shadow:0 0 0 4px #fff6ce,0 0 23px #e9c66c66}
+.advanced-results .result-cat .cat{animation:finale-cat 3s ease-in-out infinite}
+@keyframes finale-cat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
+.reduce-effects .advanced-finale{display:none}
+@media(prefers-reduced-motion:reduce){.advanced-finale{display:none}}
