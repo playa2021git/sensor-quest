@@ -92,3 +92,14 @@ Chromiumの既定パスは/usr/bin/chromium。別の場所では `CHROMIUM_PATH=
 基礎編は緑の太枠、応用編は紫と金の二重枠で区別します。文字のウェーブ、カードのライトスイープ・ホバー浮上、猫の登場と浮遊、選択肢の順次登場、正解時の放射バーストを加えています。問題文・選択肢・採点・解放条件は変更していません。
 
 [Motion Prompt](https://showheyohtaki.github.io/motion-prompt/)（MIT、© 2026 Shohei Ohtaki）の #081 Hover lift、#022 Light sweep、#130 Wave text、#003 Burst を参考・移植しています。CSSのイージングは近似、文字の上下距離は文字サイズに比例、バーストは背景・ハートを省いた透明レイヤーにしています。演出OFFとOSの「動きを減らす」で停止します。
+
+解説画面では、追加で次のMotion Promptを使っています（MIT、出典は各実装ファイル）。
+
+- [#001 Pop-in](https://showheyohtaki.github.io/motion-prompt/#001)：次へ進むボタン。ばねの式で1度登場して保持。
+- [#005 Mask reveal](https://showheyohtaki.github.io/motion-prompt/#005)：不正解／最適以外の解説を上下のマスクから表示。0.35秒・0.55秒から開始し、最後は表示を保持。
+- [#008 Kinetic typography](https://showheyohtaki.github.io/motion-prompt/#008)：判定文字に「ドン！」の拡大・着地を適用。
+- [#012 Shape morph](https://showheyohtaki.github.io/motion-prompt/#012)：解説の猫の下で丸・四角・星・ハートが変形。元の輪郭240点・4.7秒周期を使用し、背景のみ透明化。
+- [#016 Parallax](https://showheyohtaki.github.io/motion-prompt/#016)：タイトルの背景・写真・猫を異なる奥行き係数で動かす。元の4.7秒の正弦波を1往復して停止。
+- [#020 Zoom through](https://showheyohtaki.github.io/motion-prompt/#020)：正解／最適の解説へ丸い穴を通って拡大。元の指数倍率と1.65秒の加減速を使用。ZOOMの文字を正解表示へ、穴の向こうを実際の解説DOMへ置換。
+
+第1問の解説は猫を100×150pxに縮めて本文側を広げ、1366×768で説明と2つの図をスクロールせず読めます。`npm run test:motion` はこの収まり、両モードの切り替え、画面移動後の後片付け、演出OFF・reduced-motionを確認します。

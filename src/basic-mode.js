@@ -1,3 +1,4 @@
+import { animateFeedback } from './feedback-motion.js';
 import { metalShine, finaleEffects } from './celebrations.js';
 import { basicQuestions, basicScore, BASIC_PASS_SCORE } from './basics.js';
 export const progressKey = 'sensor-quest-basics-v1';
@@ -30,6 +31,7 @@ export function createBasicMode({app, cat, advanced, celebrate}) {
     if(phase!=='question')return;phase='explanation';answers.push(value);const q=basicQuestions[index], correct=value===q.answer;
     frame(`<main class="basic-board basic-explanation ${correct?'answer-correct':'answer-incorrect'} ${q.diagram?'has-diagram':''}"><div class="answer-status-border" aria-hidden="true"></div>${correct?metalShine():''}<div class="basic-heading"><span>基礎編 / 解説</span><b>第 ${index+1} 問 / 10問</b></div><div class="basic-answer-label ${correct?'correct':'incorrect'}">${correct?'正解！':'ここを確認しよう'}<span>あなたの回答：${value?'○':'×'} ／ 正解：${q.answer?'○':'×'}</span></div><div class="basic-explain-grid"><aside class="basic-feedback-aside">${visual(q)}<div class="basic-feedback-cat">${cat(correct?'success':'sad')}<b>${correct?'その調子！':'いっしょに確認しよう'}</b></div>${q.diagram?`<figure class="pir-diagram"><svg viewBox="0 0 320 155" role="img" aria-label="白いレンズの正面から左右にも広く検知範囲が広がる模式図。赤外線を発射する図ではありません。"><path d="M160 126 L15 35 Q160 -25 305 35 Z" fill="#c5f2df" stroke="#16785b" stroke-width="3" stroke-dasharray="9 6"/><rect x="136" y="140" width="48" height="12" rx="5" fill="#286452"/><path d="M136 140 A24 18 0 0 1 184 140" fill="#fff" stroke="#6b8391" stroke-width="3"/></svg><figcaption>レンズの前に左右へ広がる範囲の模式図。角度・距離は機種によって異なります。</figcaption></figure>`:''}</aside><section><h1>${esc(q.title)}</h1><p class="basic-explain-text">${esc(q.explanation)}</p><p class="basic-note">${esc(q.note)}</p>${q.diagram?narrowPirDiagram(true):''}</section></div><button class="gold basic-next">${index===9?'結果を見る':'次の問題へ'} ›</button></main>`);
     app.querySelector('.basic-next').onclick=()=>{index++;if(index===10)result();else show();};
+    animateFeedback(app.querySelector('.basic-explanation'),correct);
     if(correct)celebrate('optimal');
   }
   function result() {
