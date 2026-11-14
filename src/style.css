@@ -176,3 +176,20 @@ button.gold{transition:transform .15s}
 .result-message{padding-left:116px}
 body.stage-two.reduce-effects .mission-lights{filter:none}
 @media(prefers-reduced-motion:reduce){.stage-two .mission-lights{filter:none}}
+
+/* One-shot arcade judgement on a fresh answer, never during review. */
+.answer-burst{position:fixed;inset:0;z-index:50;display:grid;place-items:center;pointer-events:none;overflow:hidden}
+.answer-burst strong{position:relative;font-size:clamp(64px,9vw,142px);font-weight:1000;font-style:italic;letter-spacing:-3px;line-height:1.3;color:#fff;background:linear-gradient(105deg,#ff688e 5%,#ffba50 22%,#ffff91 36%,#78ffbc 50%,#7ceaff 64%,#a9a2ff 80%,#ff91df 95%);background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 5px 0 #14203c) drop-shadow(0 0 16px #b6caff);animation:judgement-pop 1s cubic-bezier(.2,.9,.3,1) both}
+.answer-burst.possible strong{font-size:clamp(64px,8vw,112px);letter-spacing:1px;background:none;color:#86ffb0;-webkit-text-fill-color:currentColor;filter:drop-shadow(0 4px 0 #124b35) drop-shadow(0 0 12px #1f975f)}
+.burst-halo,.burst-ring{position:absolute;left:50%;top:50%;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none}
+.burst-halo{width:640px;height:330px;background:radial-gradient(ellipse,#213455e6,#20345099 40%,transparent 70%);animation:burst-halo 1s both}
+.burst-ring{width:120px;height:120px;border:8px solid #b8faff;box-shadow:0 0 28px #a19bff,inset 0 0 24px #a19bff;animation:burst-ring .85s ease-out both}
+.answer-burst.possible .burst-ring{border-color:#8fffc0;box-shadow:0 0 22px #54dd94}
+.answer-burst i{position:absolute;left:50%;top:50%;width:10px;height:25px;border-radius:5px;background:hsl(var(--hue) 100% 76%);box-shadow:0 0 12px currentColor;color:hsl(var(--hue) 100% 76%);animation:burst-particle .9s ease-out both;transform:rotate(var(--angle)) translateY(0)}
+.answer-burst.possible i{background:#8fffc0;color:#8fffc0;width:6px;height:16px;--reach:160px!important}
+@keyframes judgement-pop{0%{opacity:0;transform:scale(.3) rotate(-9deg)}18%{opacity:1;transform:scale(1.12) rotate(-5deg)}32%,65%{opacity:1;transform:scale(1) rotate(-5deg)}100%{opacity:0;transform:scale(1.18) translateY(-35px) rotate(-5deg)}}
+@keyframes burst-particle{0%{opacity:0;transform:rotate(var(--angle)) translateY(-25px) scale(.3)}15%{opacity:1}100%{opacity:0;transform:rotate(var(--angle)) translateY(calc(-1 * var(--reach))) scale(.1)}}
+@keyframes burst-ring{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(5);border-width:1px}}
+@keyframes burst-halo{0%,100%{opacity:0}15%,65%{opacity:1}}
+.reduce-effects .answer-burst{display:none}
+@media(prefers-reduced-motion:reduce){.answer-burst{display:none}}

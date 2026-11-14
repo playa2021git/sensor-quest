@@ -62,6 +62,12 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
     await page.keyboard.press(key); await page.keyboard.press(key);
     const evaluation = questions[i].choices.find(c => c.id === id).evaluation;
     await page.locator(`.selection.${evaluation}`).waitFor();
+    if (evaluation === 'unsuitable') assert.equal(await page.locator('.answer-burst').count(), 0);
+    else {
+      assert.equal(await page.locator('.answer-burst strong').innerText(), evaluation === 'optimal' ? 'MARVELOUS!' : 'GOOD!');
+      if (i === 0) { await page.waitForTimeout(180); await page.screenshot({ path:'work/marvelous-burst.png' }); }
+      await page.locator('.answer-burst').waitFor({ state:'detached' });
+    }
     const feedback = await page.locator('.explanation-panel').getAttribute('class');
     assert.equal(feedback.includes('feedback-optimal'), evaluation === 'optimal');
     assert.equal(feedback.includes('feedback-possible'), evaluation === 'possible');
@@ -80,6 +86,7 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
   for (let i = 0; i < 10; i++) {
     assert.equal(await page.locator('body').evaluate(el => el.classList.contains('stage-two')), i >= 5);
     assert.equal(await page.locator('[role="tab"]').count(), 4);
+    assert.equal(await page.locator('.answer-burst').count(), 0);
     for (const choice of questions[i].choices) {
       await page.locator(`[data-option="${choice.id}"]`).click();
       assert.ok((await page.locator('.option-detail').innerText()).includes(choice.information));
@@ -90,7 +97,7 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
     assert.equal(await page.locator('[role="tab"]').first().getAttribute('aria-selected'), 'true');
     await page.locator('[data-action="review-next"]').click();
   }
-  checks.push('10 questions via keys, double-answer guard, mixed score and rank, review all 40 choice explanations, theme during review');
+  checks.push('10 questions via keys, double-answer guard, MARVELOUS/GOOD bursts and cleanup, no burst for unsuitable/review/effects off, mixed score and rank, review all 40 choice explanations, theme during review');
   // Perfect score and celebration, then disabling every animation.
   await page.locator('[data-action="start"]').click();
   for (let i = 0; i < 10; i++) { await page.locator('[data-choice="best"]').click(); await layout(page, `optimal explanation ${i+1}`); await next(page, i); }
@@ -108,6 +115,7 @@ async function next(page, i) { await page.locator('[data-action="next"]').click(
     const choice = questions[i].choices.find(c => c.evaluation === 'possible') || questions[i].choices.find(c => c.id !== 'best' && c.evaluation === 'optimal') || questions[i].choices.find(c => c.evaluation === 'unsuitable');
     await page.locator(`[data-choice="${choice.id}"]`).click();
     await page.locator(`.selection.${choice.evaluation}`).waitFor();
+    assert.equal(await page.locator('.answer-burst').count(), 0);
     if (i === 0) { assert.equal(choice.id, 'c0'); assert.match(await page.locator('.selection-label').innerText(), /\+1点/); assert.match(await page.locator('.selected-reason').innerText(), /水/); }
     await layout(page, `possible explanation ${i+1}`);
     await next(page, i);

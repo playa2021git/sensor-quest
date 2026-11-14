@@ -69,6 +69,17 @@ function answer(id) {
   answers.push(evaluate(questions[index], id));
   playAnswerSound(answers.at(-1).score);
   explanation(answers.at(-1));
+  answerCelebration(answers.at(-1).evaluation);
+}
+function answerCelebration(evaluation) {
+  if (!effectsEnabled() || !['optimal', 'possible'].includes(evaluation)) return;
+  const burst = document.createElement('div');
+  burst.className = `answer-burst ${evaluation}`;
+  burst.setAttribute('aria-hidden', 'true');
+  const marvelous = evaluation === 'optimal';
+  burst.innerHTML = `<div class="burst-halo"></div><div class="burst-ring"></div>${Array.from({ length: marvelous ? 32 : 12 }, (_, i) => `<i style="--angle:${i * 360 / (marvelous ? 32 : 12)}deg;--hue:${i * 47};--reach:${180 + i % 5 * 35}px"></i>`).join('')}<strong>${marvelous ? 'MARVELOUS!' : 'GOOD!'}</strong>`;
+  app.querySelector('.game').append(burst);
+  setTimeout(() => burst.remove(), 1050);
 }
 function playAnswerSound(score) {
   if (!settings.volume) return;
